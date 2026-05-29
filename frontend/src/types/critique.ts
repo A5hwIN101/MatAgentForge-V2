@@ -1,51 +1,43 @@
-export type CritiqueFlagKind = "warning" | "success" | "info";
-
-export type CritiqueFlag = {
-  kind: CritiqueFlagKind;
-  label: string;
-  detail?: string;
+export type Flag = {
+  icon: string;
+  text: string;
+  severity: string;
 };
 
-export type CritiqueSuggestion = {
-  label: string;
-  detail?: string;
+export type Suggestion = {
+  text: string;
+  rationale: string;
 };
 
-export type CritiqueCitation = {
-  label: string;
+export type Citation = {
+  rule_id: string;
   source: string;
+  confidence: number;
 };
 
-export type CritiqueSummary = {
-  rulesPassed: number;
-  rulesTotal: number;
-  critiqueScore: number;
-  verdict: string;
+export type Contradiction = {
+  rule_a: string;
+  rule_b: string;
+  type: string;
+  resolution: string;
+  llm_reasoning: string;
 };
 
-export type CritiqueSections = {
-  flags: CritiqueFlag[];
-  suggestions: CritiqueSuggestion[];
-  citations?: CritiqueCitation[];
+export type CritiqueTrace = {
+  rules_matched: string[];
+  contradictions: Contradiction[];
+  citations: Citation[];
 };
 
-export type CritiqueTracePreview = {
-  contradictionCount: number;
-  evidenceCount: number;
-};
-
-export type Critique = {
+export type CritiqueCard = {
   id: string;
-  chatId: string;
-  chatItemId: string;
-  materialId: string;
-  runId: string;
-  summary: CritiqueSummary;
-  sections: CritiqueSections;
-  traceJson?: Record<string, unknown>;
-  tracePreview?: CritiqueTracePreview;
-  modelName: string;
-  promptVersion: string;
-  rulesetVersion: string;
-  createdAt: string;
+  material_formula: string;
+  verdict: string;
+  score: number;
+  domain_rules_passed: number;
+  domain_rules_total: number;
+  flags: Flag[];
+  suggestions: Suggestion[];
+  explanation: string;
+  trace: CritiqueTrace;
 };

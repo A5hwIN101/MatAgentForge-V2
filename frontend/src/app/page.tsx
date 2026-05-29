@@ -1,5 +1,5 @@
-import { ChatInterfacePlaceholder } from "@/components/chat-interface-placeholder";
+import { ChatLayout } from "@/features/chat/ChatLayout";
 
 export default function Home() {
-  return <ChatInterfacePlaceholder />;
+  return <ChatLayout />;
 }

@@ -1,3 +1,5 @@
+import type { CritiqueCard } from "@/types/critique";
+
 export type ChatStatus = "active" | "archived";
 
 export type Chat = {
@@ -12,6 +14,7 @@ export type Chat = {
 
 export type ChatItemType =
   | "user_message"
+  | "agent_status"
   | "status_stream"
   | "agent_text"
   | "critique_card";
@@ -24,7 +27,7 @@ export type ChatItem = {
   itemType: ChatItemType;
   role: ChatRole;
   contentText?: string;
-  contentJson?: Record<string, unknown>;
+  contentJson?: Record<string, unknown> | CritiqueCard;
   sequenceNo: number;
   createdAt: string;
 };
