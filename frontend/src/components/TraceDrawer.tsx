@@ -32,7 +32,7 @@ export function TraceDrawer({ trace }: TraceDrawerProps) {
       </button>
 
       {isOpen ? (
-        <div className="space-y-5 border-t border-slate-800 px-4 py-4 text-sm text-slate-300">
+        <div className="max-h-[28rem] space-y-5 overflow-y-auto border-t border-slate-800 px-4 py-4 text-sm text-slate-300">
           <section>
             <h4 className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
               Rules Matched

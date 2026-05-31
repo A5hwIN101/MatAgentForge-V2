@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.db.models import Critique, Material
-from app.graph.workflow import run_screening_workflow
+from app.graph.workflow import InvalidMaterialFormulaError, run_screening_workflow
 from app.services.chat_service import ChatService
 from app.streaming.sse import SSEEmitter
 
@@ -90,6 +90,16 @@ async def screen_material(
                 if critique_card is not None:
                     persist_critique(service.db, payload.formula, critique_card.model_dump(mode="json"))
                 await emit_event("screen.completed", {"status": "completed"})
+            except InvalidMaterialFormulaError as error:
+                await emit_event(
+                    "screen.failed",
+                    {
+                        "code": "invalid_formula",
+                        "title": "Invalid material formula",
+                        "error": str(error),
+                        "hint": "Check capitalization and element symbols, e.g. LiCoO2.",
+                    },
+                )
             except (groq.APIError, groq.APITimeoutError, groq.APIConnectionError) as error:
                 await emit_event("screen.failed", {"error": str(error)})
             except Exception as error:

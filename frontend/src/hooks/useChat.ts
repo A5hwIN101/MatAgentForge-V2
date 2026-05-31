@@ -144,13 +144,20 @@ export function useChat(apiBaseUrl = BACKEND_URL): UseChatResult {
           throw new Error("Chat detail missing chat metadata");
         }
 
-        setChatDetails((current) => ({
-          ...current,
-          [activeChatId]: {
-            chat: baseChat,
-            items: (payload.items ?? []).map(mapChatItem),
-          },
-        }));
+        setChatDetails((current) => {
+          const existingDetail = current[activeChatId];
+          const persistedItems = (payload.items ?? []).map(mapChatItem);
+          const optimisticItems =
+            existingDetail?.items.filter((item) => item.id.startsWith("local-")) ?? [];
+
+          return {
+            ...current,
+            [activeChatId]: {
+              chat: baseChat,
+              items: [...optimisticItems, ...persistedItems],
+            },
+          };
+        });
         setError(null);
       } catch (detailError) {
         setError(detailError instanceof Error ? detailError.message : "Unable to load chat detail");

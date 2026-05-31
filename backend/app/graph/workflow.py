@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import re
 from itertools import combinations
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,7 @@ import groq
 from groq import Groq
 from langgraph.graph import END, START, StateGraph
 from pymatgen.core import Composition
+from pymatgen.core.periodic_table import DummySpecies
 
 from app.graph.state import ScreeningState
 from app.schemas.critique import CritiqueCard
@@ -35,6 +37,11 @@ SYSTEM_PROMPT_EXPLANATION = (
     "You are a battery materials expert. Write a concise 2-3 sentence explanation for the critique. "
     "Focus on the most important benefits, violations, and contradictions."
 )
+
+
+class InvalidMaterialFormulaError(ValueError):
+    def __init__(self, message: str = "Invalid material formula. Please check the formula and try again."):
+        super().__init__(message)
 
 
 def get_groq_client() -> Groq:
@@ -82,6 +89,36 @@ def parse_json_block(text: str) -> dict[str, Any]:
 
 def format_candidate_for_prompt(candidate: dict[str, Any]) -> str:
     return json.dumps(candidate, indent=2, default=str)
+
+
+def normalize_material_formula(formula: str) -> str:
+    normalized = formula.strip()
+    grouped_elements_pattern = re.compile(r"\(([A-Z][a-z]?(?:,[A-Z][a-z]?)+)\)")
+    if grouped_elements_pattern.search(normalized):
+        normalized = grouped_elements_pattern.sub(lambda match: match.group(1).replace(",", ""), normalized)
+    return normalized
+
+
+def validate_material_formula(formula: str) -> str:
+    normalized = normalize_material_formula(formula)
+    if not normalized:
+        raise InvalidMaterialFormulaError()
+
+    if re.search(r"(^|[A-Za-z\)\]])0\d+", normalized):
+        raise InvalidMaterialFormulaError()
+
+    try:
+        composition = Composition(normalized)
+    except Exception as error:
+        raise InvalidMaterialFormulaError() from error
+
+    if composition.num_atoms <= 0 or not composition.elements:
+        raise InvalidMaterialFormulaError()
+
+    if any(isinstance(element, DummySpecies) for element in composition.elements):
+        raise InvalidMaterialFormulaError()
+
+    return normalized
 
 
 def _run_non_streaming_completion(messages: list[dict[str, str]]) -> str:
@@ -152,10 +189,12 @@ async def candidate_analysis_node(state: ScreeningState) -> dict[str, Any]:
         f"Screening {state['material_formula']}...",
     )
 
-    composition = Composition(state["material_formula"])
+    normalized_formula = validate_material_formula(state["material_formula"])
+    composition = Composition(normalized_formula)
     oxidation_guesses = composition.oxi_state_guesses()
     candidate = {
         "formula": state["material_formula"],
+        "normalized_formula": normalized_formula,
         "reduced_formula": composition.reduced_formula,
         "elements": [str(element) for element in composition.elements],
         "num_atoms": composition.num_atoms,

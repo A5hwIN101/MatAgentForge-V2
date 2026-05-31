@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CritiqueCard } from "@/components/CritiqueCard";
 import { FeedbackActions } from "@/features/feedback/FeedbackActions";
-import type { ChatItem, CritiqueCard as CritiqueCardType } from "@/types";
+import type {
+  ChatItem,
+  CritiqueCard as CritiqueCardType,
+  ScreeningErrorCard,
+} from "@/types";
 
 const BACKEND_URL = "http://localhost:8000";
 
@@ -15,6 +19,8 @@ type MessageListProps = {
 export function MessageList({ messages }: MessageListProps) {
   const [feedbackNotice, setFeedbackNotice] = useState("");
   const [feedbackError, setFeedbackError] = useState("");
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const bottomAnchorRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!feedbackNotice) {
@@ -27,6 +33,19 @@ export function MessageList({ messages }: MessageListProps) {
 
     return () => window.clearTimeout(timeoutId);
   }, [feedbackNotice]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const anchor = bottomAnchorRef.current;
+    if (!container || !anchor) {
+      return;
+    }
+
+    anchor.scrollIntoView({
+      block: "end",
+      behavior: messages.length > 0 ? "smooth" : "auto",
+    });
+  }, [messages]);
 
   const handleFeedback = async (
     critiqueId: string,
@@ -57,14 +76,17 @@ export function MessageList({ messages }: MessageListProps) {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
+    <div
+      ref={scrollContainerRef}
+      className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-2"
+    >
       {feedbackNotice ? (
-        <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+        <div className="shrink-0 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
           {feedbackNotice}
         </div>
       ) : null}
       {feedbackError ? (
-        <div className="rounded-2xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+        <div className="shrink-0 rounded-2xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
           {feedbackError}
         </div>
       ) : null}
@@ -84,6 +106,22 @@ export function MessageList({ messages }: MessageListProps) {
                     }
                   />
                 </div>
+              </div>
+            );
+          }
+
+          if (message.itemType === "error_card" && message.contentJson) {
+            const errorCard = message.contentJson as ScreeningErrorCard;
+
+            return (
+              <div key={message.id} className="flex justify-start">
+                <article className="w-full max-w-2xl rounded-[1.75rem] border border-rose-500/30 bg-rose-950/20 px-5 py-5 text-slate-100">
+                  <h3 className="text-lg font-semibold text-rose-200">{errorCard.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">{errorCard.message}</p>
+                  {errorCard.hint ? (
+                    <p className="mt-3 text-sm text-slate-400">{errorCard.hint}</p>
+                  ) : null}
+                </article>
               </div>
             );
           }
@@ -121,6 +159,7 @@ export function MessageList({ messages }: MessageListProps) {
           Choose a chat or start a new one to screen a material candidate.
         </div>
       )}
+      <div ref={bottomAnchorRef} className="h-px shrink-0" />
     </div>
   );
 }

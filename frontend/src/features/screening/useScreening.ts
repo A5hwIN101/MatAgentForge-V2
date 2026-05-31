@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import type { CritiqueCard } from "@/types";
+import type { CritiqueCard, ScreeningErrorCard } from "@/types";
 
 const BACKEND_URL = "http://localhost:8000";
 
@@ -18,6 +18,7 @@ type ScreeningState = {
   events: ScreeningEvent[];
   streamText: string;
   critique: CritiqueCard | null;
+  failure: ScreeningErrorCard | null;
   isStreaming: boolean;
   error: string | null;
 };
@@ -32,6 +33,7 @@ const initialState: ScreeningState = {
   events: [],
   streamText: "",
   critique: null,
+  failure: null,
   isStreaming: false,
   error: null,
 };
@@ -49,6 +51,7 @@ export function useScreening(apiBaseUrl = BACKEND_URL): UseScreeningResult {
         events: [],
         streamText: "",
         critique: null,
+        failure: null,
         isStreaming: true,
         error: null,
       });
@@ -100,6 +103,7 @@ export function useScreening(apiBaseUrl = BACKEND_URL): UseScreeningResult {
               const nextEvents = [...current.events, event];
               let nextText = current.streamText;
               let nextCritique = current.critique;
+              let nextFailure = current.failure;
               let nextError = current.error;
               let nextStreaming = current.isStreaming;
 
@@ -109,9 +113,25 @@ export function useScreening(apiBaseUrl = BACKEND_URL): UseScreeningResult {
 
               if (event.event === "critique.ready") {
                 nextCritique = event.data as unknown as CritiqueCard;
+                nextFailure = null;
               }
 
               if (event.event === "screen.failed") {
+                nextCritique = null;
+                nextFailure = {
+                  title:
+                    typeof event.data.title === "string"
+                      ? event.data.title
+                      : "Unable to screen material",
+                  message:
+                    typeof event.data.error === "string"
+                      ? event.data.error
+                      : "Screening failed.",
+                  hint:
+                    typeof event.data.hint === "string" ? event.data.hint : undefined,
+                  code:
+                    typeof event.data.code === "string" ? event.data.code : undefined,
+                };
                 nextError =
                   typeof event.data.error === "string"
                     ? event.data.error
@@ -127,6 +147,7 @@ export function useScreening(apiBaseUrl = BACKEND_URL): UseScreeningResult {
                 events: nextEvents,
                 streamText: nextText,
                 critique: nextCritique,
+                failure: nextFailure,
                 isStreaming: nextStreaming,
                 error: nextError,
               };
@@ -141,6 +162,10 @@ export function useScreening(apiBaseUrl = BACKEND_URL): UseScreeningResult {
       } catch (error) {
         setState((current) => ({
           ...current,
+          failure: {
+            title: "Unable to screen material",
+            message: error instanceof Error ? error.message : "Unknown screening error",
+          },
           isStreaming: false,
           error: error instanceof Error ? error.message : "Unknown screening error",
         }));

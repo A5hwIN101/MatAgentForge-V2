@@ -1,5 +1,12 @@
 import type { CritiqueCard } from "@/types/critique";
 
+export type ScreeningErrorCard = {
+  title: string;
+  message: string;
+  hint?: string;
+  code?: string;
+};
+
 export type ChatStatus = "active" | "archived";
 
 export type Chat = {
@@ -17,7 +24,8 @@ export type ChatItemType =
   | "agent_status"
   | "status_stream"
   | "agent_text"
-  | "critique_card";
+  | "critique_card"
+  | "error_card";
 
 export type ChatRole = "user" | "assistant" | "system";
 
@@ -27,7 +35,7 @@ export type ChatItem = {
   itemType: ChatItemType;
   role: ChatRole;
   contentText?: string;
-  contentJson?: Record<string, unknown> | CritiqueCard;
+  contentJson?: Record<string, unknown> | CritiqueCard | ScreeningErrorCard;
   sequenceNo: number;
   createdAt: string;
 };
