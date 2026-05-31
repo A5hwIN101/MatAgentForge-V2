@@ -373,6 +373,14 @@ Tested with NaCl:
 * Frontend lint passes [done]
 * Frontend build passes [done]
 
+### Bucket 4.8: Rule Relevance Gating
+* Remove baseline rule fallback from finalize_critique_node [done]
+* Only include rules in rules_matched when explicitly matched [done]
+* Gate cobalt_scarcity_penalty to cobalt-containing candidates [done]
+* Prevent thermal_runaway_guardrail from matching by default [done]
+* Prevent high_ionic_conductivity from matching by default [done]
+* Add regression tests for baseline rule gating [done]
+
 ---
 
 ## Chunk 5: Deployment

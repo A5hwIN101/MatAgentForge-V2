@@ -10,6 +10,7 @@ class ScreeningState(TypedDict, total=False):
     material_formula: str
     rules_loaded: List[dict]
     candidate: dict
+    matched_rules: List[dict]
     violations: List[dict]
     contradictions: List[dict]
     explanation_stream: str

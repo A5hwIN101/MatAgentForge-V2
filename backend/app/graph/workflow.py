@@ -20,8 +20,9 @@ MODEL_NAME = "llama-3.1-8b-instant"
 RULES_PATH = Path(__file__).resolve().parents[2] / "rules" / "extracted_rules.json"
 ENV_PATH = Path(__file__).resolve().parents[3] / ".env"
 SYSTEM_PROMPT_RULE = (
-    "You are a materials chemistry expert. Verify if this material violates this rule. "
-    "Respond: YES (violated) or NO (compliant). Brief reasoning."
+    "You are a materials chemistry expert. Decide whether a screening rule is specifically applicable to the candidate material. "
+    "Return strict JSON with keys applicable (boolean), outcome ('concern', 'benefit', or 'not_applicable'), and reasoning (string). "
+    "Only mark applicable when you have material-specific justification. Do not assume thermal runaway or ionic conductivity rules apply by default."
 )
 SYSTEM_PROMPT_CONTRADICTION = (
     "Do these two rules conflict? Answer YES or NO first, then give a concise explanation."
@@ -91,6 +92,22 @@ def format_candidate_for_prompt(candidate: dict[str, Any]) -> str:
     return json.dumps(candidate, indent=2, default=str)
 
 
+def build_matched_rule_entry(
+    rule: dict[str, Any],
+    *,
+    outcome: str,
+    reasoning: str,
+) -> dict[str, Any]:
+    return {
+        "rule_id": rule["id"],
+        "rule_name": rule["name"],
+        "description": rule["description"],
+        "severity": rule.get("severity", "warning"),
+        "outcome": outcome,
+        "reasoning": reasoning.strip(),
+    }
+
+
 def normalize_material_formula(formula: str) -> str:
     normalized = formula.strip()
     grouped_elements_pattern = re.compile(r"\(([A-Z][a-z]?(?:,[A-Z][a-z]?)+)\)")
@@ -119,6 +136,38 @@ def validate_material_formula(formula: str) -> str:
         raise InvalidMaterialFormulaError()
 
     return normalized
+
+
+def evaluate_special_case_rule(
+    rule: dict[str, Any],
+    candidate: dict[str, Any],
+) -> tuple[bool, dict[str, Any] | None]:
+    elements = set(candidate.get("elements", []))
+    if rule["id"] == "cobalt_scarcity_penalty":
+        if "Co" in elements:
+            return True, build_matched_rule_entry(
+                rule,
+                outcome="concern",
+                reasoning="Candidate contains cobalt, so cobalt scarcity and scale-up cost risk are directly relevant.",
+            )
+        return True, None
+
+    if rule["id"] == "thermal_runaway_guardrail":
+        return True, None
+
+    if rule["id"] == "high_ionic_conductivity":
+        reduced_formula = str(candidate.get("reduced_formula", ""))
+        layered_oxide_elements = {"Li", "O"} & elements and {"Co", "Ni", "Mn"} & elements
+        phosphate_like = "P" in elements or "F" in elements
+        if reduced_formula in {"LiCoO2", "LiNiMnCoO2"} or (layered_oxide_elements and not phosphate_like):
+            return True, build_matched_rule_entry(
+                rule,
+                outcome="benefit",
+                reasoning="Candidate is a layered lithium transition-metal oxide, so lithium-ion transport relevance is material-specific rather than assumed by default.",
+            )
+        return True, None
+
+    return False, None
 
 
 def _run_non_streaming_completion(messages: list[dict[str, str]]) -> str:
@@ -208,10 +257,26 @@ async def candidate_analysis_node(state: ScreeningState) -> dict[str, Any]:
 async def rule_verification_node(state: ScreeningState) -> dict[str, Any]:
     await emit_step_event(state, "rule_verification", "Verifying candidate against domain rules...")
 
-    candidate_text = format_candidate_for_prompt(state["candidate"])
+    candidate_summary = {
+        "formula": state["candidate"]["formula"],
+        "normalized_formula": state["candidate"].get("normalized_formula"),
+        "reduced_formula": state["candidate"]["reduced_formula"],
+        "elements": state["candidate"]["elements"],
+        "oxidation_state_guesses": state["candidate"]["oxidation_state_guesses"],
+    }
+    candidate_text = format_candidate_for_prompt(candidate_summary)
+    matched_rules: list[dict[str, Any]] = []
     violations: list[dict[str, Any]] = []
 
     for rule in state["rules_loaded"]:
+        handled_locally, local_match = evaluate_special_case_rule(rule, state["candidate"])
+        if handled_locally:
+            if local_match is not None:
+                matched_rules.append(local_match)
+                if local_match["outcome"] == "concern":
+                    violations.append(local_match)
+            continue
+
         compact_rule = {
             "id": rule["id"],
             "name": rule.get("name"),
@@ -233,23 +298,29 @@ async def rule_verification_node(state: ScreeningState) -> dict[str, Any]:
             },
         ]
 
-        response_text = await groq_call_with_retry(messages, stream=False, max_retries=1)
-        normalized = response_text.strip().upper()
-        reasoning = response_text.strip()
-        is_violated = normalized.startswith("YES")
+        try:
+            response_text = await groq_call_with_retry(messages, stream=False, max_retries=1)
+            parsed = parse_json_block(response_text)
+        except Exception:
+            continue
 
-        if is_violated:
-            violations.append(
-                {
-                    "rule_id": rule["id"],
-                    "rule_name": rule["name"],
-                    "description": rule["description"],
-                    "severity": rule.get("severity", "warning"),
-                    "reasoning": reasoning,
-                }
-            )
+        if not parsed.get("applicable", False):
+            continue
 
-    return {"violations": violations}
+        outcome = str(parsed.get("outcome", "not_applicable")).strip().lower()
+        if outcome not in {"concern", "benefit"}:
+            continue
+
+        matched_rule = build_matched_rule_entry(
+            rule,
+            outcome=outcome,
+            reasoning=str(parsed.get("reasoning", "")).strip() or "Material-specific applicability identified.",
+        )
+        matched_rules.append(matched_rule)
+        if outcome == "concern":
+            violations.append(matched_rule)
+
+    return {"matched_rules": matched_rules, "violations": violations}
 
 
 async def contradiction_detection_node(state: ScreeningState) -> dict[str, Any]:
@@ -337,10 +408,7 @@ async def finalize_critique_node(state: ScreeningState) -> dict[str, Any]:
 
     payload = state["critique_payload"]
     rule_lookup = {rule["id"]: rule for rule in state["rules_loaded"]}
-    matched_rule_ids = [violation["rule_id"] for violation in state["violations"]]
-    if not matched_rule_ids:
-        matched_rule_ids = [rule["id"] for rule in state["rules_loaded"][:3]]
-
+    matched_rule_ids = [rule["rule_id"] for rule in state.get("matched_rules", [])]
     citation_rule_ids = list(matched_rule_ids)
     citations: list[dict[str, Any]] = []
 
@@ -365,17 +433,7 @@ async def finalize_critique_node(state: ScreeningState) -> dict[str, Any]:
     for rule_id in citation_rule_ids:
         append_rule_citations(rule_id)
 
-    if not citations:
-        citation_rule_ids = []
-        for rule in state["rules_loaded"]:
-            if not rule.get("citations"):
-                continue
-            citation_rule_ids.append(rule["id"])
-            append_rule_citations(rule["id"])
-            if len(citation_rule_ids) >= 3:
-                break
-
-    display_rule_ids = list(dict.fromkeys(matched_rule_ids + citation_rule_ids))
+    display_rule_ids = list(dict.fromkeys(matched_rule_ids))
     critique_card = CritiqueCard(
         id=f"crit_{state['run_id']}",
         material_formula=state["material_formula"],
@@ -434,6 +492,7 @@ async def run_screening_workflow(
         "run_id": run_id,
         "material_formula": material_formula,
         "rules_loaded": [],
+        "matched_rules": [],
         "violations": [],
         "contradictions": [],
         "explanation_stream": "",
