@@ -62,6 +62,8 @@ async def screen_material(
     if chat is None:
         raise HTTPException(status_code=404, detail="Chat not found")
 
+    service.touch_chat_for_material(chat_id, payload.formula)
+    service.append_item(chat_id, "user_message", payload.formula)
     run_id = str(uuid4())
 
     async def event_stream():
@@ -88,22 +90,30 @@ async def screen_material(
                 )
                 critique_card = final_state.get("critique_card")
                 if critique_card is not None:
-                    persist_critique(service.db, payload.formula, critique_card.model_dump(mode="json"))
+                    critique_payload = critique_card.model_dump(mode="json")
+                    persist_critique(service.db, payload.formula, critique_payload)
+                    service.append_item(chat_id, "critique_card", critique_payload)
                 await emit_event("screen.completed", {"status": "completed"})
             except InvalidMaterialFormulaError as error:
+                error_payload = {
+                    "code": "invalid_formula",
+                    "title": "Invalid material formula",
+                    "error": str(error),
+                    "hint": "Check capitalization and element symbols, e.g. LiCoO2.",
+                }
+                service.append_item(chat_id, "error_card", error_payload)
                 await emit_event(
                     "screen.failed",
-                    {
-                        "code": "invalid_formula",
-                        "title": "Invalid material formula",
-                        "error": str(error),
-                        "hint": "Check capitalization and element symbols, e.g. LiCoO2.",
-                    },
+                    error_payload,
                 )
             except (groq.APIError, groq.APITimeoutError, groq.APIConnectionError) as error:
-                await emit_event("screen.failed", {"error": str(error)})
+                error_payload = {"error": str(error)}
+                service.append_item(chat_id, "error_card", error_payload)
+                await emit_event("screen.failed", error_payload)
             except Exception as error:
-                await emit_event("screen.failed", {"error": str(error)})
+                error_payload = {"error": str(error)}
+                service.append_item(chat_id, "error_card", error_payload)
+                await emit_event("screen.failed", error_payload)
             finally:
                 await queue.put(None)
 

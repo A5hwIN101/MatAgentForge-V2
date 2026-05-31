@@ -15,6 +15,7 @@ type UseChatResult = {
   usingMockData: boolean;
   setActiveChat: (chatId: string) => void;
   createChat: (title?: string) => Promise<Chat>;
+  clearHistory: () => Promise<void>;
   refreshChats: () => Promise<void>;
   appendLocalItem: (
     chatId: string,
@@ -69,13 +70,25 @@ function mapChatItem(serverItem: ServerChatItem, index: number): ChatItem {
     serverItem.type === "status_stream"
       ? "agent_status"
       : (serverItem.type as ChatItem["itemType"]);
+  let contentJson: ChatItem["contentJson"] | undefined;
+  let contentText: string | undefined = serverItem.content;
+
+  if (itemType === "critique_card" || itemType === "error_card") {
+    try {
+      contentJson = JSON.parse(serverItem.content) as ChatItem["contentJson"];
+      contentText = undefined;
+    } catch {
+      contentJson = undefined;
+    }
+  }
 
   return {
     id: serverItem.id,
     chatId: serverItem.chat_id,
     itemType,
     role: itemType === "user_message" ? "user" : "assistant",
-    contentText: serverItem.content,
+    contentText,
+    contentJson,
     sequenceNo: index + 1,
     createdAt: serverItem.created_at,
   };
@@ -200,6 +213,20 @@ export function useChat(apiBaseUrl = BACKEND_URL): UseChatResult {
     [apiBaseUrl],
   );
 
+  const clearHistory = useCallback(async () => {
+    const response = await fetch(`${apiBaseUrl}/api/chats`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to clear chat history (${response.status})`);
+    }
+
+    setChats([]);
+    setChatDetails({});
+    setActiveChatId(null);
+    setError(null);
+  }, [apiBaseUrl]);
+
   const appendLocalItem = useCallback(
     (chatId: string, item: Omit<ChatItem, "id" | "chatId" | "sequenceNo" | "createdAt">) => {
       const now = new Date().toISOString();
@@ -268,6 +295,7 @@ export function useChat(apiBaseUrl = BACKEND_URL): UseChatResult {
     usingMockData: false,
     setActiveChat: setActiveChatId,
     createChat,
+    clearHistory,
     refreshChats,
     appendLocalItem,
   };

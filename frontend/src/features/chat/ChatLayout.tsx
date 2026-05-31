@@ -20,6 +20,7 @@ export function ChatLayout() {
     error,
     setActiveChat,
     createChat,
+    clearHistory,
     appendLocalItem,
   } = useChat();
   const screening = useScreening();
@@ -128,6 +129,9 @@ export function ChatLayout() {
           activeChatId={activeChatId}
           isLoading={isLoadingChats}
           onSelectChat={setActiveChat}
+          onClearHistory={() => {
+            void clearHistory();
+          }}
           onNewChat={() => {
             void createChat("New Chat");
           }}

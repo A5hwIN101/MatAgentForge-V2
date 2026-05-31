@@ -26,3 +26,8 @@ class ChatItem(BaseModel):
     type: str
     content: str
     created_at: datetime
+
+
+class ChatClearResponse(BaseModel):
+    deleted_count: int
+    status: str

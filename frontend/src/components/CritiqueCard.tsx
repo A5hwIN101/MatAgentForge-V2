@@ -8,6 +8,10 @@ type CritiqueCardProps = {
 };
 
 export function CritiqueCard({ critique }: CritiqueCardProps) {
+  const rulesLoaded = critique.domain_rules_total;
+  const rulesMatched = critique.trace.rules_matched.length;
+  const citationCount = critique.trace.citations.length;
+
   return (
     <article className="w-full max-w-3xl rounded-[2rem] border border-slate-800 bg-slate-900/85 p-6 shadow-2xl shadow-slate-950/40 backdrop-blur">
       <header className="border-b border-slate-800 pb-5">
@@ -23,17 +27,30 @@ export function CritiqueCard({ critique }: CritiqueCardProps) {
         <dl className="space-y-3 text-sm sm:text-base">
           <div className="flex items-center justify-between gap-4">
             <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
-              Domain Rules
+              Rules Loaded
             </dt>
-            <dd className="font-semibold text-emerald-300">
-              ✅ {critique.domain_rules_passed}/{critique.domain_rules_total}
-            </dd>
+            <dd className="font-semibold text-slate-100">{rulesLoaded}</dd>
           </div>
           <div className="flex items-center justify-between gap-4">
             <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
-              Critique Score
+              Rules Matched
             </dt>
-            <dd className="font-semibold text-slate-100">{critique.score} / 10</dd>
+            <dd className="font-semibold text-emerald-300">{rulesMatched}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
+              Citations
+            </dt>
+            <dd className="font-semibold text-cyan-300">{citationCount}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
+              Risk Score
+            </dt>
+            <dd className="text-right">
+              <p className="font-semibold text-slate-100">{critique.score} / 10</p>
+              <p className="mt-1 text-xs text-slate-500">Lower is better</p>
+            </dd>
           </div>
           <div className="flex items-center justify-between gap-4">
             <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
@@ -71,7 +88,7 @@ export function CritiqueCard({ critique }: CritiqueCardProps) {
               key={`${suggestion.text}-${index}`}
               className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-4"
             >
-              <p className="text-base font-medium text-slate-100">→ {suggestion.text}</p>
+              <p className="text-base font-medium text-slate-100">-&gt; {suggestion.text}</p>
               <p className="mt-2 text-sm leading-6 text-slate-400">
                 {suggestion.rationale}
               </p>

@@ -286,6 +286,28 @@ Tested with NaCl:
 * Auto-scroll to newest streaming result [done]
 * Cap Trace drawer height and keep citations clickable [done]
 
+### Bucket 3.6.0b: Rule Label Clarity
+* Replace misleading "DOMAIN RULES 15/15" display [done]
+* Show Rules Loaded as a separate stat [done]
+* Show Rules Matched as a separate stat [done]
+* Show Citations as a separate stat [done]
+
+### Bucket 3.6.0c: Score Label Clarity
+* Inspect critique score meaning in the current backend flow [done]
+* Re-label score as Risk Score for demo clarity [done]
+* Add helper text explaining that lower is better [done]
+
+### Bucket 3.6.0d: Chat History Cleanup
+* Add Clear History action to the sidebar [done]
+* Add backend clear-history endpoint for demo reset [done]
+* Hide placeholder chats with no real screening activity [done]
+* Keep active draft chat visible while avoiding sidebar clutter [done]
+
+### Bucket 3.6.0e: Demo Test Set
+* Create a local checklist of demo materials with varied expected behavior [done]
+* Include manual fields for verdict, score, rules, citations, and notes [done]
+* Cover strong, mixed, weak, and negative-control examples [done]
+
 ### Bucket 3.6.1: Error States
 * Implement error boundary in MessageList [to be done]
 * Display error message when screen.failed received [done]

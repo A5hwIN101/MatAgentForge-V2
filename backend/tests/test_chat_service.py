@@ -43,9 +43,12 @@ def test_get_chat(tmp_path: Path) -> None:
 
 def test_list_chats(tmp_path: Path) -> None:
     service = build_service(tmp_path)
-    service.create_chat("Chat One")
-    service.create_chat("Chat Two")
-    service.create_chat("Chat Three")
+    chat_one = service.create_chat("Chat One")
+    chat_two = service.create_chat("Chat Two")
+    chat_three = service.create_chat("Chat Three")
+    service.append_item(chat_one.id, "user_message", "LiCoO2")
+    service.append_item(chat_two.id, "user_message", "LiFePO4")
+    service.append_item(chat_three.id, "user_message", "NMC")
 
     chats = service.list_chats()
 
@@ -73,3 +76,29 @@ def test_get_nonexistent_chat(tmp_path: Path) -> None:
     chat = service.get_chat("missing-chat-id")
 
     assert chat is None
+
+
+def test_list_chats_hides_empty_entries(tmp_path: Path) -> None:
+    service = build_service(tmp_path)
+    empty_chat = service.create_chat("New Chat")
+    real_chat = service.create_chat("LiCoO2")
+    service.append_item(real_chat.id, "user_message", "LiCoO2")
+
+    chats = service.list_chats()
+
+    assert len(chats) == 1
+    assert chats[0].id == real_chat.id
+    assert chats[0].id != empty_chat.id
+
+
+def test_clear_chats(tmp_path: Path) -> None:
+    service = build_service(tmp_path)
+    first_chat = service.create_chat("Chat One")
+    second_chat = service.create_chat("Chat Two")
+    service.append_item(first_chat.id, "user_message", "LiCoO2")
+    service.append_item(second_chat.id, "user_message", "LiFePO4")
+
+    deleted_count = service.clear_chats()
+
+    assert deleted_count == 2
+    assert service.list_chats(include_empty=True) == []
