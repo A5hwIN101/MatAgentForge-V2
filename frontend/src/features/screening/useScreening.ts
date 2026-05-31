@@ -4,6 +4,8 @@ import { useCallback, useMemo, useState } from "react";
 
 import type { CritiqueCard } from "@/types";
 
+const BACKEND_URL = "http://localhost:8000";
+
 type ScreeningEvent = {
   event: string;
   chat_id: string;
@@ -34,7 +36,7 @@ const initialState: ScreeningState = {
   error: null,
 };
 
-export function useScreening(apiBaseUrl = "http://127.0.0.1:8000"): UseScreeningResult {
+export function useScreening(apiBaseUrl = BACKEND_URL): UseScreeningResult {
   const [state, setState] = useState<ScreeningState>(initialState);
 
   const reset = useCallback(() => {
@@ -54,9 +56,7 @@ export function useScreening(apiBaseUrl = "http://127.0.0.1:8000"): UseScreening
       try {
         const response = await fetch(`${apiBaseUrl}/api/chats/${chatId}/screen`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ formula }),
         });
 
@@ -75,26 +75,33 @@ export function useScreening(apiBaseUrl = "http://127.0.0.1:8000"): UseScreening
           }
 
           buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? "";
 
-          for (const line of lines) {
-            if (!line.startsWith("data: ")) {
+          while (buffer.includes("\n\n")) {
+            const separatorIndex = buffer.indexOf("\n\n");
+            const rawEvent = buffer.slice(0, separatorIndex);
+            buffer = buffer.slice(separatorIndex + 2);
+
+            const dataLine = rawEvent
+              .split("\n")
+              .find((line) => line.startsWith("data: "));
+
+            if (!dataLine) {
               continue;
             }
 
-            const json = line.slice(6).trim();
-            if (!json) {
+            const payload = dataLine.slice(6).trim();
+            if (!payload) {
               continue;
             }
 
-            const event = JSON.parse(json) as ScreeningEvent;
+            const event = JSON.parse(payload) as ScreeningEvent;
 
             setState((current) => {
               const nextEvents = [...current.events, event];
               let nextText = current.streamText;
               let nextCritique = current.critique;
-              let isStreaming = current.isStreaming;
+              let nextError = current.error;
+              let nextStreaming = current.isStreaming;
 
               if (event.event === "text.delta" && typeof event.data.delta === "string") {
                 nextText += event.data.delta;
@@ -104,16 +111,24 @@ export function useScreening(apiBaseUrl = "http://127.0.0.1:8000"): UseScreening
                 nextCritique = event.data as unknown as CritiqueCard;
               }
 
+              if (event.event === "screen.failed") {
+                nextError =
+                  typeof event.data.error === "string"
+                    ? event.data.error
+                    : "Screening failed.";
+                nextStreaming = false;
+              }
+
               if (event.event === "screen.completed") {
-                isStreaming = false;
+                nextStreaming = false;
               }
 
               return {
                 events: nextEvents,
                 streamText: nextText,
                 critique: nextCritique,
-                isStreaming,
-                error: null,
+                isStreaming: nextStreaming,
+                error: nextError,
               };
             });
           }
@@ -138,7 +153,8 @@ export function useScreening(apiBaseUrl = "http://127.0.0.1:8000"): UseScreening
     () =>
       state.events
         .filter((event) => event.event === "step.updated")
-        .map((event) => String(event.data.label ?? "")),
+        .map((event) => String(event.data.label ?? ""))
+        .filter(Boolean),
     [state.events],
   );
 

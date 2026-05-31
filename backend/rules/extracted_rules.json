@@ -3,18 +3,261 @@
     "id": "cobalt_scarcity_penalty",
     "name": "Cobalt Scarcity Penalty",
     "description": "Materials with high cobalt dependence should be flagged for supply-chain and cost risk at production scale.",
-    "severity": "warning"
+    "severity": "warning",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "citations": [],
+    "domain": "general screening",
+    "evidence_from_paper": ""
   },
   {
     "id": "thermal_runaway_guardrail",
     "name": "Thermal Runaway Guardrail",
     "description": "Materials with elevated thermal instability should be flagged when safety margins are narrow for battery pack deployment.",
-    "severity": "warning"
+    "severity": "warning",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "citations": [],
+    "domain": "general screening",
+    "evidence_from_paper": ""
   },
   {
     "id": "high_ionic_conductivity",
     "name": "High Ionic Conductivity Benefit",
     "description": "Materials with strong lithium-ion transport characteristics should be recognized as a positive performance signal.",
+    "severity": "success",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "citations": [],
+    "domain": "general screening",
+    "evidence_from_paper": ""
+  },
+  {
+    "id": "material_property_combinations_for_which_magnetic_field_influenc",
+    "name": "Material property combinations for which magnetic field influence may become sig",
+    "description": "Material property combinations for which magnetic field influence may become significant are computed for certain systems subject to compositional constraints.",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "domain": "magnetic field influence on ionic transport",
+    "evidence_from_paper": "Material property combinations for which magnetic field influence may become significant are then computed for certain systems subject to compositional constraints.",
+    "citations": [
+      {
+        "arxiv_id": "2605.04370v1",
+        "paper_title": "Magnetic influence on ion transport in concentrated solid solutions: An analytic investigation",
+        "authors": "Timothy Carlson, Sanjay Govindjee",
+        "year": 2026,
+        "url": "http://arxiv.org/abs/2605.04370v1"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "near_degenerate_multi_component_transport_is_assumed_for_the_der",
+    "name": "Near degenerate multi-component transport is assumed for the derived model for b",
+    "description": "Near degenerate multi-component transport is assumed for the derived model for binary conductors in a magnetic field to fit experimental magneto-resistance data well.",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "domain": "model assumptions for binary conductors in a magnetic field",
+    "evidence_from_paper": "provided an assumption of near degenerate multi-component transport",
+    "citations": [
+      {
+        "arxiv_id": "2605.04370v1",
+        "paper_title": "Magnetic influence on ion transport in concentrated solid solutions: An analytic investigation",
+        "authors": "Timothy Carlson, Sanjay Govindjee",
+        "year": 2026,
+        "url": "http://arxiv.org/abs/2605.04370v1"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "basnf4_exhibits_high_ionic_conductivity_and_chemical_stability",
+    "name": "BaSnF4 exhibits high ionic conductivity and chemical stability",
+    "description": "BaSnF4 exhibits high ionic conductivity and chemical stability",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "domain": "ionic conductivity and chemical stability",
+    "evidence_from_paper": "Fast-ion conductors such as BaSnF4 are of significant interest for next-generation solid-state battery technologies due to their high ionic conductivity and chemical stability.",
+    "citations": [
+      {
+        "arxiv_id": "2604.08376v1",
+        "paper_title": "Theory-Guided Discovery of Pressure-Induced Transitions in Fast-Ion Conductor BaSnF4",
+        "authors": "Robin Turnbull, Zhang YingLong, Claudio Cazorla, Akun Liang, Rahman Saqib, Miriam Pena-Alvarez, Catalin Popescu, Laura Pampillo, Daniel Errandonea",
+        "year": 2026,
+        "url": "http://arxiv.org/abs/2604.08376v1"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "pressure_induced_phase_transitions_can_tune_functional_propertie",
+    "name": "Pressure-induced phase transitions can tune functional properties in BaSnF4",
+    "description": "Pressure-induced phase transitions can tune functional properties in BaSnF4",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "domain": "pressure-induced phase transitions and functional properties",
+    "evidence_from_paper": "pressure-induced modifications for tuning functional properties",
+    "citations": [
+      {
+        "arxiv_id": "2604.08376v1",
+        "paper_title": "Theory-Guided Discovery of Pressure-Induced Transitions in Fast-Ion Conductor BaSnF4",
+        "authors": "Robin Turnbull, Zhang YingLong, Claudio Cazorla, Akun Liang, Rahman Saqib, Miriam Pena-Alvarez, Catalin Popescu, Laura Pampillo, Daniel Errandonea",
+        "year": 2026,
+        "url": "http://arxiv.org/abs/2604.08376v1"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "microstructures_with_higher_specific_surface_areas_tend_to_have_",
+    "name": "Microstructures with higher specific surface areas tend to have better ionic and",
+    "description": "Microstructures with higher specific surface areas tend to have better ionic and electronic conductivity.",
+    "threshold_value": 0.5,
+    "threshold_unit": "m^2/m^3",
+    "domain": "electronic and ionic conductivity",
+    "evidence_from_paper": "By linking these geometrical descriptors to macroscopic properties, virtual materials testing provides quantitative insight into how microstructure influences material performance.",
+    "citations": [
+      {
+        "arxiv_id": "2603.23248v1",
+        "paper_title": "Virtual materials testing of ASSB cathodes combining AI-based stochastic 3D modeling and numerical simulations",
+        "authors": "Anina Dufter, Sabrina Weber, Orkun Furat, Johannes Schubert, René Rekers, Maximilian Luczak, Erik Glatt, Andreas Wiegmann, Anja Bielefeld, Volker Schmidt",
+        "year": 2026,
+        "url": "http://arxiv.org/abs/2603.23248v1"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "microstructures_with_lower_mean_geodesic_tortuosities_tend_to_ha",
+    "name": "Microstructures with lower mean geodesic tortuosities tend to have better ionic ",
+    "description": "Microstructures with lower mean geodesic tortuosities tend to have better ionic and electronic conductivity.",
+    "threshold_value": 0.5,
+    "threshold_unit": "dimensionless",
+    "domain": "electronic and ionic conductivity",
+    "evidence_from_paper": "In the present paper, this framework is applied for ASSB cathodes. In addition, by systematically varying model parameters, a broad range of 3D microstructures can be generated, which remain close to the original cathode morphology while inducing targeted changes in selected geometrical descriptors.",
+    "citations": [
+      {
+        "arxiv_id": "2603.23248v1",
+        "paper_title": "Virtual materials testing of ASSB cathodes combining AI-based stochastic 3D modeling and numerical simulations",
+        "authors": "Anina Dufter, Sabrina Weber, Orkun Furat, Johannes Schubert, René Rekers, Maximilian Luczak, Erik Glatt, Andreas Wiegmann, Anja Bielefeld, Volker Schmidt",
+        "year": 2026,
+        "url": "http://arxiv.org/abs/2603.23248v1"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "for_k_ion_intercalation_memristor_devices_look_for_materials_wit",
+    "name": "For K-ion intercalation memristor devices, look for materials with scalable nano",
+    "description": "For K-ion intercalation memristor devices, look for materials with scalable nanoscale switching and exceptional materials versatility.",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "domain": "materials versatility",
+    "evidence_from_paper": "Our findings establish PBAs as a new class of intercalation memristors with scalable nanoscale switching and exceptional materials versatility...",
+    "citations": [
+      {
+        "arxiv_id": "2601.04724v3",
+        "paper_title": "Nanoscale resistive switching in electrodeposited MOF Prussian blue analogs driven by K-ion intercalation probed by C-AFM",
+        "authors": "L. B. Avila, O. de Leuze, M. Pohlitz, M. A Villena, Ramon Torres-Cavanillas, C. Ducarme, A. Lopes Temporao, T. G. Coppée, A. Moureaux, S. Arib, Eugenio Coronado, C. K. Müller, J. B. Roldán, B. Hackens, F. Abreu Araujo",
+        "year": 2026,
+        "url": "http://arxiv.org/abs/2601.04724v3"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "for_high_rate_k_ion_intercalation_memristor_devices_look_for_mat",
+    "name": "For high-rate K-ion intercalation memristor devices, look for materials with hig",
+    "description": "For high-rate K-ion intercalation memristor devices, look for materials with high operating speeds, above 200 V/s.",
+    "threshold_value": 200,
+    "threshold_unit": "V/s",
+    "domain": "operating speed",
+    "evidence_from_paper": "This unprecedented speed establishes PBAs as a distinct, high-rate class of K-ion intercalation memristors suitable for fast, high-density neuromorphic and memory applications.",
+    "citations": [
+      {
+        "arxiv_id": "2601.04724v3",
+        "paper_title": "Nanoscale resistive switching in electrodeposited MOF Prussian blue analogs driven by K-ion intercalation probed by C-AFM",
+        "authors": "L. B. Avila, O. de Leuze, M. Pohlitz, M. A Villena, Ramon Torres-Cavanillas, C. Ducarme, A. Lopes Temporao, T. G. Coppée, A. Moureaux, S. Arib, Eugenio Coronado, C. K. Müller, J. B. Roldán, B. Hackens, F. Abreu Araujo",
+        "year": 2026,
+        "url": "http://arxiv.org/abs/2601.04724v3"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "materials_with_ultralow_thermal_conductivity_may_be_limited_for_",
+    "name": "Materials with ultralow thermal conductivity may be limited for practical applic",
+    "description": "Materials with ultralow thermal conductivity may be limited for practical application",
+    "threshold_value": 3.8,
+    "threshold_unit": "Wm^{-1}K^{-1}",
+    "domain": "thermal conductivity",
+    "evidence_from_paper": "Our study not only identifies the ultralow thermal conductivity of LiYTiO4 as a key limitation for its practical application...",
+    "citations": [
+      {
+        "arxiv_id": "2512.06954v1",
+        "paper_title": "Probing Anharmonic Lattice Dynamics and Thermal Transport in Layered Perovskite LiYTiO4 Anode",
+        "authors": "Lin Zhang, Wen Liu, Mingquan He, Jun Huang",
+        "year": 2025,
+        "url": "http://arxiv.org/abs/2512.06954v1"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "materials_with_low_frequency_diffusive_raman_scattering_are_prom",
+    "name": "Materials with low-frequency, diffusive Raman scattering are promising solid ele",
+    "description": "Materials with low-frequency, diffusive Raman scattering are promising solid electrolytes.",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "domain": "Raman scattering",
+    "evidence_from_paper": "low-frequency, diffusive Raman scattering as a spectral signature of fast ionic conduction",
+    "citations": [
+      {
+        "arxiv_id": "2511.21404v1",
+        "paper_title": "Revealing Fast Ionic Conduction in Solid Electrolytes through Machine Learning Accelerated Raman Calculations",
+        "authors": "Manuel Grumet, Takeru Miyagawa, Olivier Pittet, Paolo Pegolo, Karin S. Thalmann, Waldemar Kaiser, David A. Egger",
+        "year": 2025,
+        "url": "http://arxiv.org/abs/2511.21404v1"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "materials_with_clear_raman_signatures_of_liquid_like_ion_conduct",
+    "name": "Materials with clear Raman signatures of liquid-like ion conduction are promisin",
+    "description": "Materials with clear Raman signatures of liquid-like ion conduction are promising sodium-ion conductors.",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "domain": "Raman signatures of ion conduction",
+    "evidence_from_paper": "clear Raman signatures of liquid-like ion conduction",
+    "citations": [
+      {
+        "arxiv_id": "2511.21404v1",
+        "paper_title": "Revealing Fast Ionic Conduction in Solid Electrolytes through Machine Learning Accelerated Raman Calculations",
+        "authors": "Manuel Grumet, Takeru Miyagawa, Olivier Pittet, Paolo Pegolo, Karin S. Thalmann, Waldemar Kaiser, David A. Egger",
+        "year": 2025,
+        "url": "http://arxiv.org/abs/2511.21404v1"
+      }
+    ],
+    "severity": "success"
+  },
+  {
+    "id": "above_900_k_srcl_2_is_a_fast_ion_conductor",
+    "name": "Above 900 K, SrCl$_2$ is a fast-ion conductor.",
+    "description": "Above 900 K, SrCl$_2$ is a fast-ion conductor.",
+    "threshold_value": 900,
+    "threshold_unit": "K",
+    "domain": "temperature threshold for fast-ion conduction",
+    "evidence_from_paper": "In this study, we examine the ionic conduction pathways in single crystal SrCl$_2$, which is a fast-ion conductor above 900~K,",
+    "citations": [
+      {
+        "arxiv_id": "2509.20312v2",
+        "paper_title": "4D-QENS Analysis of Correlated Ionic Conduction in SrCl$_2$",
+        "authors": "Jared Coles, Omar Chmaissem, Matthew Krogstad, Daniel M. Pajerowski, Feng Ye, Duck Young Chung, Mercouri G. Kanatzidis, Stephan Rosenkranz, Raymond Osborn",
+        "year": 2025,
+        "url": "http://arxiv.org/abs/2509.20312v2"
+      }
+    ],
     "severity": "success"
   }
 ]

@@ -16,6 +16,7 @@ from app.schemas.critique import CritiqueCard
 
 MODEL_NAME = "llama-3.1-8b-instant"
 RULES_PATH = Path(__file__).resolve().parents[2] / "rules" / "extracted_rules.json"
+ENV_PATH = Path(__file__).resolve().parents[3] / ".env"
 SYSTEM_PROMPT_RULE = (
     "You are a materials chemistry expert. Verify if this material violates this rule. "
     "Respond: YES (violated) or NO (compliant). Brief reasoning."
@@ -35,9 +36,21 @@ SYSTEM_PROMPT_EXPLANATION = (
     "Focus on the most important benefits, violations, and contradictions."
 )
 
-groq_api_key = os.getenv("GROQ_API_KEY")
-print(f"GROQ_API_KEY: {(groq_api_key or 'None')[:10]}")
-client = Groq(api_key=os.getenv("GROQ_API_KEY"), max_retries=0)
+
+def get_groq_client() -> Groq:
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key and ENV_PATH.exists():
+        for raw_line in ENV_PATH.read_text(encoding="utf-8").splitlines():
+            line = raw_line.lstrip("\ufeff").strip()
+            if line.startswith("GROQ_API_KEY="):
+                api_key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                break
+    if not api_key:
+        raise groq.GroqError(
+            "The api_key client option must be set either by passing api_key to the client or by setting the GROQ_API_KEY environment variable"
+        )
+
+    return Groq(api_key=api_key, max_retries=0)
 
 
 async def emit_step_event(state: ScreeningState, step: str, label: str) -> None:
@@ -54,17 +67,17 @@ async def emit_step_event(state: ScreeningState, step: str, label: str) -> None:
 
 
 def parse_json_block(text: str) -> dict[str, Any]:
-    text = text.strip()
-    if text.startswith("```"):
-        text = text.strip("`")
-        text = text.replace("json", "", 1).strip()
+    payload = text.strip()
+    if payload.startswith("```"):
+        payload = payload.strip("`")
+        payload = payload.replace("json", "", 1).strip()
 
-    start = text.find("{")
-    end = text.rfind("}")
+    start = payload.find("{")
+    end = payload.rfind("}")
     if start == -1 or end == -1:
         raise ValueError(f"Unable to parse JSON from model response: {text}")
 
-    return json.loads(text[start : end + 1])
+    return json.loads(payload[start : end + 1])
 
 
 def format_candidate_for_prompt(candidate: dict[str, Any]) -> str:
@@ -72,6 +85,7 @@ def format_candidate_for_prompt(candidate: dict[str, Any]) -> str:
 
 
 def _run_non_streaming_completion(messages: list[dict[str, str]]) -> str:
+    client = get_groq_client()
     response = client.chat.completions.create(
         model=MODEL_NAME,
         messages=messages,
@@ -82,6 +96,7 @@ def _run_non_streaming_completion(messages: list[dict[str, str]]) -> str:
 
 
 def _run_streaming_completion(messages: list[dict[str, str]]) -> list[str]:
+    client = get_groq_client()
     deltas: list[str] = []
     stream = client.chat.completions.create(
         model=MODEL_NAME,
@@ -122,7 +137,7 @@ async def groq_call_with_retry(
 
 
 async def load_domain_rules_node(state: ScreeningState) -> dict[str, Any]:
-    await emit_step_event(state, "load_domain_rules", "⚙ Loading domain rules...")
+    await emit_step_event(state, "load_domain_rules", "Loading domain rules...")
 
     with RULES_PATH.open("r", encoding="utf-8") as rules_file:
         rules = json.load(rules_file)
@@ -134,7 +149,7 @@ async def candidate_analysis_node(state: ScreeningState) -> dict[str, Any]:
     await emit_step_event(
         state,
         "candidate_analysis",
-        f"🔍 Screening {state['material_formula']}...",
+        f"Screening {state['material_formula']}...",
     )
 
     composition = Composition(state["material_formula"])
@@ -152,19 +167,28 @@ async def candidate_analysis_node(state: ScreeningState) -> dict[str, Any]:
 
 
 async def rule_verification_node(state: ScreeningState) -> dict[str, Any]:
-    await emit_step_event(state, "rule_verification", "🧪 Verifying candidate against domain rules...")
+    await emit_step_event(state, "rule_verification", "Verifying candidate against domain rules...")
 
     candidate_text = format_candidate_for_prompt(state["candidate"])
     violations: list[dict[str, Any]] = []
 
     for rule in state["rules_loaded"]:
+        compact_rule = {
+            "id": rule["id"],
+            "name": rule.get("name"),
+            "description": rule.get("description"),
+            "domain": rule.get("domain"),
+            "threshold_value": rule.get("threshold_value"),
+            "threshold_unit": rule.get("threshold_unit"),
+            "severity": rule.get("severity"),
+        }
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT_RULE},
             {
                 "role": "user",
                 "content": (
                     f"Candidate:\n{candidate_text}\n\n"
-                    f"Rule:\n{json.dumps(rule, indent=2)}\n\n"
+                    f"Rule:\n{json.dumps(compact_rule, indent=2)}\n\n"
                     "Does the candidate violate the rule?"
                 ),
             },
@@ -190,7 +214,7 @@ async def rule_verification_node(state: ScreeningState) -> dict[str, Any]:
 
 
 async def contradiction_detection_node(state: ScreeningState) -> dict[str, Any]:
-    await emit_step_event(state, "contradiction_detection", "⚖ Checking contradiction reasoning...")
+    await emit_step_event(state, "contradiction_detection", "Checking contradiction reasoning...")
 
     contradictions: list[dict[str, Any]] = []
     for violation_a, violation_b in combinations(state["violations"], 2):
@@ -222,7 +246,7 @@ async def contradiction_detection_node(state: ScreeningState) -> dict[str, Any]:
 
 
 async def critique_generation_node(state: ScreeningState) -> dict[str, Any]:
-    await emit_step_event(state, "critique_generation", "⚠ Running critique...")
+    await emit_step_event(state, "critique_generation", "Running critique...")
 
     candidate_text = format_candidate_for_prompt(state["candidate"])
     violation_text = json.dumps(state["violations"], indent=2)
@@ -270,9 +294,49 @@ async def critique_generation_node(state: ScreeningState) -> dict[str, Any]:
 
 
 async def finalize_critique_node(state: ScreeningState) -> dict[str, Any]:
-    await emit_step_event(state, "finalize_critique", "✅ Finalizing critique card...")
+    await emit_step_event(state, "finalize_critique", "Finalizing critique card...")
 
     payload = state["critique_payload"]
+    rule_lookup = {rule["id"]: rule for rule in state["rules_loaded"]}
+    matched_rule_ids = [violation["rule_id"] for violation in state["violations"]]
+    if not matched_rule_ids:
+        matched_rule_ids = [rule["id"] for rule in state["rules_loaded"][:3]]
+
+    citation_rule_ids = list(matched_rule_ids)
+    citations: list[dict[str, Any]] = []
+
+    def append_rule_citations(rule_id: str) -> None:
+        rule = rule_lookup.get(rule_id)
+        if rule is None:
+            return
+        for citation in rule.get("citations", []):
+            citations.append(
+                {
+                    "rule_id": rule["id"],
+                    "rule_name": rule.get("name", rule["id"]),
+                    "arxiv_id": citation.get("arxiv_id", ""),
+                    "paper_title": citation.get("paper_title", ""),
+                    "authors": citation.get("authors", ""),
+                    "year": citation.get("year"),
+                    "url": citation.get("url", ""),
+                    "evidence_from_paper": rule.get("evidence_from_paper") or rule.get("description", ""),
+                }
+            )
+
+    for rule_id in citation_rule_ids:
+        append_rule_citations(rule_id)
+
+    if not citations:
+        citation_rule_ids = []
+        for rule in state["rules_loaded"]:
+            if not rule.get("citations"):
+                continue
+            citation_rule_ids.append(rule["id"])
+            append_rule_citations(rule["id"])
+            if len(citation_rule_ids) >= 3:
+                break
+
+    display_rule_ids = list(dict.fromkeys(matched_rule_ids + citation_rule_ids))
     critique_card = CritiqueCard(
         id=f"crit_{state['run_id']}",
         material_formula=state["material_formula"],
@@ -284,16 +348,13 @@ async def finalize_critique_node(state: ScreeningState) -> dict[str, Any]:
         suggestions=payload.get("suggestions", []),
         explanation=state.get("explanation_stream", payload.get("explanation", "")),
         trace={
-            "rules_matched": [rule["id"] for rule in state["rules_loaded"]],
-            "contradictions": state["contradictions"],
-            "citations": [
-                {
-                    "rule_id": violation["rule_id"],
-                    "source": "rules/extracted_rules.json",
-                    "confidence": 0.8,
-                }
-                for violation in state["violations"]
+            "rules_matched": [
+                rule_lookup[rule_id].get("name", rule_id)
+                for rule_id in display_rule_ids
+                if rule_id in rule_lookup
             ],
+            "contradictions": state["contradictions"],
+            "citations": citations,
         },
     )
 

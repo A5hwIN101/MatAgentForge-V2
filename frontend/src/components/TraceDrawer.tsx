@@ -10,6 +10,15 @@ type TraceDrawerProps = {
 
 export function TraceDrawer({ trace }: TraceDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const citationsByRule = trace.citations.reduce<Record<string, typeof trace.citations>>(
+    (accumulator, citation) => {
+      const key = citation.rule_name || citation.rule_id;
+      accumulator[key] ??= [];
+      accumulator[key].push(citation);
+      return accumulator;
+    },
+    {},
+  );
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-950/70">
@@ -31,8 +40,38 @@ export function TraceDrawer({ trace }: TraceDrawerProps) {
             <ul className="mt-3 space-y-2">
               {trace.rules_matched.length > 0 ? (
                 trace.rules_matched.map((rule) => (
-                  <li key={rule} className="rounded-xl bg-slate-900/70 px-3 py-2">
-                    {rule}
+                  <li key={rule} className="rounded-xl bg-slate-900/70 px-3 py-3">
+                    <p className="font-medium text-slate-100">{rule}</p>
+                    <div className="mt-2 space-y-2">
+                      {(citationsByRule[rule] ?? []).length > 0 ? (
+                        citationsByRule[rule].map((citation) => (
+                          <div
+                            key={`${citation.rule_id}-${citation.arxiv_id}-${citation.url}`}
+                            className="rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-3"
+                          >
+                            <p className="text-sm text-slate-300">
+                              {rule} - {citation.paper_title} ({citation.authors},{" "}
+                              {citation.year ?? "n/a"}){" "}
+                              <a
+                                href={citation.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-cyan-300 underline decoration-cyan-500/60 underline-offset-2 transition hover:text-cyan-200"
+                              >
+                                [Link]
+                              </a>
+                            </p>
+                            {citation.evidence_from_paper ? (
+                              <p className="mt-2 text-xs leading-5 text-slate-500">
+                                {citation.evidence_from_paper}
+                              </p>
+                            ) : null}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-xs text-slate-500">No citations attached.</p>
+                      )}
+                    </div>
                   </li>
                 ))
               ) : (
@@ -76,13 +115,23 @@ export function TraceDrawer({ trace }: TraceDrawerProps) {
               {trace.citations.length > 0 ? (
                 trace.citations.map((citation) => (
                   <article
-                    key={`${citation.rule_id}-${citation.source}`}
+                    key={`${citation.rule_id}-${citation.arxiv_id}-${citation.url}`}
                     className="rounded-xl bg-slate-900/70 px-3 py-3"
                   >
-                    <p className="font-medium text-slate-200">{citation.rule_id}</p>
-                    <p className="mt-1 text-slate-400">{citation.source}</p>
-                    <p className="mt-2 text-xs uppercase tracking-[0.2em] text-emerald-300">
-                      Confidence {Math.round(citation.confidence * 100)}%
+                    <p className="font-medium text-slate-200">{citation.rule_name}</p>
+                    <p className="mt-1 text-slate-400">
+                      {citation.paper_title} ({citation.authors}, {citation.year ?? "n/a"})
+                    </p>
+                    <a
+                      href={citation.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-block text-xs uppercase tracking-[0.2em] text-cyan-300 underline decoration-cyan-500/60 underline-offset-2 hover:text-cyan-200"
+                    >
+                      Open arXiv
+                    </a>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                      {citation.evidence_from_paper ?? `arXiv ${citation.arxiv_id}`}
                     </p>
                   </article>
                 ))

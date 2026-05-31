@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
+from app.db.models import Critique, Material
 from app.graph.workflow import run_screening_workflow
 from app.services.chat_service import ChatService
 from app.streaming.sse import SSEEmitter
@@ -22,6 +23,33 @@ class ScreenRequest(BaseModel):
 
 def get_chat_service(db: Annotated[Session, Depends(get_db)]) -> ChatService:
     return ChatService(db)
+
+
+def persist_critique(db: Session, formula: str, critique_payload: dict) -> None:
+    existing_critique = db.get(Critique, critique_payload["id"])
+    if existing_critique is not None:
+        return
+
+    material = Material(
+        id=f"mat_{uuid4()}",
+        formula=formula,
+        normalized_formula=formula,
+    )
+    db.add(material)
+    db.flush()
+
+    critique = Critique(
+        id=critique_payload["id"],
+        material_id=material.id,
+        verdict=str(critique_payload["verdict"]),
+        score=float(critique_payload["score"]),
+        flags=critique_payload.get("flags", []),
+        suggestions=critique_payload.get("suggestions", []),
+        explanation=critique_payload.get("explanation", ""),
+        trace=critique_payload.get("trace", {}),
+    )
+    db.add(critique)
+    db.commit()
 
 
 @router.post("/{chat_id}/screen")
@@ -52,12 +80,15 @@ async def screen_material(
         async def run_workflow() -> None:
             await emit_event("screen.started", {"formula": payload.formula})
             try:
-                await run_screening_workflow(
+                final_state = await run_screening_workflow(
                     chat_id=chat_id,
                     run_id=run_id,
                     material_formula=payload.formula,
                     emit_event=emit_event,
                 )
+                critique_card = final_state.get("critique_card")
+                if critique_card is not None:
+                    persist_critique(service.db, payload.formula, critique_card.model_dump(mode="json"))
                 await emit_event("screen.completed", {"status": "completed"})
             except (groq.APIError, groq.APITimeoutError, groq.APIConnectionError) as error:
                 await emit_event("screen.failed", {"error": str(error)})

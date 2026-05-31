@@ -18,7 +18,6 @@ export function ChatLayout() {
     isLoadingChats,
     isLoadingDetail,
     error,
-    usingMockData,
     setActiveChat,
     createChat,
     appendLocalItem,
@@ -83,9 +82,9 @@ export function ChatLayout() {
     screening.streamText,
   ]);
 
-  const handleSubmitFormula = async (formula: string) => {
+  const handleSubmitFormula = async (incomingChatId: string | null, formula: string) => {
     const chat = activeChat ?? (await createChat(`${formula} screening`));
-    if (!activeChatId) {
+    if (!incomingChatId) {
       setActiveChat(chat.id);
     }
 
@@ -96,24 +95,6 @@ export function ChatLayout() {
     });
 
     await screening.startScreening(chat.id, formula);
-  };
-
-  const handleFeedback = (action: "approve" | "reject" | "modify") => {
-    const message =
-      action === "approve"
-        ? "Thanks for the feedback. Analyze next material?"
-        : action === "reject"
-          ? "Rejection feedback captured for critique tuning."
-          : "Modification request captured for the next screening pass.";
-
-    if (activeChatId) {
-      appendLocalItem(activeChatId, {
-        itemType: "agent_text",
-        role: "assistant",
-        contentText: message,
-      });
-    }
-    console.log("Feedback action:", action);
   };
 
   return (
@@ -140,15 +121,16 @@ export function ChatLayout() {
                   {activeChat?.title ?? "Chat Interface"}
                 </h1>
               </div>
-              <div className="text-sm text-slate-400">
-                {usingMockData ? "Demo data loaded" : "Backend data loaded"}
-              </div>
+              <div className="text-sm text-slate-400">Live backend connection</div>
             </div>
             {error ? <p className="mt-3 text-sm text-amber-300">{error}</p> : null}
+            {screening.error ? (
+              <p className="mt-3 text-sm text-rose-300">{screening.error}</p>
+            ) : null}
           </header>
 
           <div className="flex flex-1 flex-col gap-5 py-5">
-            <MessageList messages={timelineMessages} onFeedback={handleFeedback} />
+            <MessageList messages={timelineMessages} />
 
             {isLoadingDetail ? (
               <div className="rounded-2xl border border-dashed border-slate-800 px-4 py-3 text-sm text-slate-500">
@@ -158,7 +140,11 @@ export function ChatLayout() {
           </div>
 
           <div className="border-t border-slate-800 pt-5">
-            <InputBox disabled={screening.isStreaming} onSubmit={handleSubmitFormula} />
+            <InputBox
+              chatId={activeChatId}
+              disabled={screening.isStreaming}
+              onSubmit={handleSubmitFormula}
+            />
           </div>
         </section>
       </div>

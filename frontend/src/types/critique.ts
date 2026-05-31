@@ -11,8 +11,13 @@ export type Suggestion = {
 
 export type Citation = {
   rule_id: string;
-  source: string;
-  confidence: number;
+  rule_name: string;
+  arxiv_id: string;
+  paper_title: string;
+  authors: string;
+  year: number | null;
+  url: string;
+  evidence_from_paper?: string | null;
 };
 
 export type Contradiction = {

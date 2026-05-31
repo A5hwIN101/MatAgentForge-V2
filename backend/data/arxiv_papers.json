@@ -1,0 +1,534 @@
+[
+  {
+    "id": "arxiv_2605.04370v1",
+    "title": "Magnetic influence on ion transport in concentrated solid solutions: An analytic investigation",
+    "authors": [
+      "Timothy Carlson",
+      "Sanjay Govindjee"
+    ],
+    "arxiv_id": "2605.04370v1",
+    "year": 2026,
+    "url": "http://arxiv.org/abs/2605.04370v1",
+    "abstract": "It is well established that magnetic fields have a significant effect on transport in certain classes of electronic conductors. Less reported, however, are similar effects in solid ionic conductors. Despite the rarity of Hall mobility measurements in ionic conductors, recent experimental work in batteries and other systems has demonstrated that an applied magnetic field can significantly and beneficially alter ionic transport and electrochemical processes in solid materials in a way that would not be predicted from naïve Hall coefficient estimates. In this work, the influence of a magnetic field on ion transport in solids is investigated analytically, and general multi-component transport equations accounting for magnetic effects are presented. Specific models are then derived for solid, isotropic binary and single ion conductors. Material property combinations for which magnetic field influence may become significant are then computed for certain systems subject to compositional constraints. Finally, it is demonstrated that the derived model for binary conductors in a magnetic field fits experimental magneto-resistance data well for the fluoride ion conducting solid Pb$_{0.66}$Cd$_{0.34}$F$_2$, provided an assumption of near degenerate multi-component transport."
+  },
+  {
+    "id": "arxiv_2604.08376v1",
+    "title": "Theory-Guided Discovery of Pressure-Induced Transitions in Fast-Ion Conductor BaSnF4",
+    "authors": [
+      "Robin Turnbull",
+      "Zhang YingLong",
+      "Claudio Cazorla",
+      "Akun Liang",
+      "Rahman Saqib",
+      "Miriam Pena-Alvarez",
+      "Catalin Popescu",
+      "Laura Pampillo",
+      "Daniel Errandonea"
+    ],
+    "arxiv_id": "2604.08376v1",
+    "year": 2026,
+    "url": "http://arxiv.org/abs/2604.08376v1",
+    "abstract": "Fast-ion conductors such as BaSnF4 are of significant interest for next-generation solid-state battery technologies due to their high ionic conductivity and chemical stability. However, the behaviour of these materials under extreme conditions remains poorly understood, despite the relevance of pressure-induced modifications for tuning functional properties. In this study, we combine density functional theory (DFT) calculations with high-pressure experiments to investigate the structural evolution of BaSnF4 up to 40 GPa. DFT predicts two pressure-induced phase transitions: from the ambient-pressure tetragonal P4/nmm phase to a monoclinic P21/m-I structure at 10 GPa, and subsequently to a denser monoclinic P21/m-II phase at 32 GPa. The first transition is experimentally confirmed via angle-dispersive X-ray diffraction, Raman spectroscopy, and electrical resistivity measurements, all performed at ambient temperature. The second transition is supported by distinct changes in high-pressure Raman modes and resistivity behaviour, consistent with a further structural reorganization. These findings not only clarify the high-pressure phase diagram of BaSnF4, but also shed light on the potential for pressure-tuned ionic transport in fluorostannate-based solid electrolytes."
+  },
+  {
+    "id": "arxiv_2603.23248v1",
+    "title": "Virtual materials testing of ASSB cathodes combining AI-based stochastic 3D modeling and numerical simulations",
+    "authors": [
+      "Anina Dufter",
+      "Sabrina Weber",
+      "Orkun Furat",
+      "Johannes Schubert",
+      "René Rekers",
+      "Maximilian Luczak",
+      "Erik Glatt",
+      "Andreas Wiegmann",
+      "Anja Bielefeld",
+      "Volker Schmidt"
+    ],
+    "arxiv_id": "2603.23248v1",
+    "year": 2026,
+    "url": "http://arxiv.org/abs/2603.23248v1",
+    "abstract": "The performance of all-solid-state battery (ASSB) cathodes strongly depends on their microstructure. Optimizing the cathode morphology can therefore enhance effective macroscopic properties such as ionic and electronic conductivity. The search for optimized microstructures can be facilitated by virtual materials testing: By integrating image analysis and stochastic microstructure modeling to generate a wide range of realistic 3D microstructures and evaluate their effective macroscopic properties by means of numerical simulations, thereby reducing the need for extensive physical experiments. This approach allows for the investigation of structure-property relationships through parametric regression models that incorporate relevant geometrical descriptors of microstructures such as volume fractions, mean geodesic tortuosities, specific surface areas, and constrictivities. By linking these geometrical descriptors to macroscopic properties, virtual materials testing provides quantitative insight into how microstructure influences material performance. In the present paper, this framework is applied for ASSB cathodes. In addition, by systematically varying model parameters, a broad range of 3D microstructures can be generated, which remain close to the original cathode morphology while inducing targeted changes in selected geometrical descriptors. The resulting database enables the calibration of regression models whose predictive performance is assessed by comparing predicted and simulated effective properties such as the ionic and electronic conductivity, thereby quantifying how accurately combinations of geometrical descriptors can explain and predict variations in effective macroscopic properties."
+  },
+  {
+    "id": "arxiv_2603.12898v1",
+    "title": "Neutron-enhanced ion transport in cathode coating of Li-ion batteries",
+    "authors": [
+      "Ha M. Nguyen",
+      "Carson D. Ziemke",
+      "David Stalla",
+      "Bikash Saha",
+      "Narendirakumar Narayanan",
+      "Sebastián Amaya-Roncancio",
+      "Carlos Wexler",
+      "John Gahl",
+      "Yangchuan Xing",
+      "Thomas W. Heitmann"
+    ],
+    "arxiv_id": "2603.12898v1",
+    "year": 2026,
+    "url": "http://arxiv.org/abs/2603.12898v1",
+    "abstract": "Polycrystalline solid-state ionic conductors (PolySSICs) are key energy materials for all-solid-state Li-ion batteries (LIBs). However, achieving room-temperature ionic conductivity comparable to that of liquid electrolytes ($σ\\sim 10^{-2}-10\\,\\mathrm{S\\cdot cm^{-1}}$) remains a major challenge. Here, we experimentally demonstrate that thermal neutron irradiation provides an effective strategy for engineering ion transport in a model PolySSIC, LiBO$_2$, a promising electrode coating material for LIBs. High-flux ($\\sim 10^{9}$ neutrons$\\cdot$cm$^{-2}\\cdot$s$^{-1}$) thermal neutrons ($\\sim 25$ meV), delivered at Beam Port E of the University of Missouri Research Reactor (MURR), selectively transmute the strong neutron absorbers $^{10}\\mathrm{B}$ and $^{6}\\mathrm{Li}$ at their natural abundances ($\\sim19.9\\%$ and $\\sim7.5\\%$). This process generates lattice vacancies within polycrystalline grains while preserving long-range crystallographic order. In addition, $γ$ photons produced during $^{10}$B transmutation release electrons that suppress atomic displacement and partially neutralize the space charge associated with positively charged oxygen vacancies at grain boundaries. As a result, the ionic conductivity increases by nearly $20\\%$ in grains and more than $80\\%$ at grain boundaries. These results validate theoretical predictions and demonstrate a controllable strategy for enhancing ion transport in PolySSICs for solid ionic devices, including LIBs."
+  },
+  {
+    "id": "arxiv_2601.04724v3",
+    "title": "Nanoscale resistive switching in electrodeposited MOF Prussian blue analogs driven by K-ion intercalation probed by C-AFM",
+    "authors": [
+      "L. B. Avila",
+      "O. de Leuze",
+      "M. Pohlitz",
+      "M. A Villena",
+      "Ramon Torres-Cavanillas",
+      "C. Ducarme",
+      "A. Lopes Temporao",
+      "T. G. Coppée",
+      "A. Moureaux",
+      "S. Arib",
+      "Eugenio Coronado",
+      "C. K. Müller",
+      "J. B. Roldán",
+      "B. Hackens",
+      "F. Abreu Araujo"
+    ],
+    "arxiv_id": "2601.04724v3",
+    "year": 2026,
+    "url": "http://arxiv.org/abs/2601.04724v3",
+    "abstract": "K-ion intercalation in Prussian blue analogs (PBAs) is a well-established charge storage mechanism in potassium-ion batteries; here, we demonstrate that this same ion intercalation process is the basis for nanoscale resistive switching behavior in PBA-base memristive devices. Using C-AFM, we directly visualize and electrically control this intercalation process within sub-100 nm volumes, revealing reversible, localized conductance modulation driven by K-ion intercalation and Fe^(2+)/Fe^(3+) redox reconfiguration. This nanoscale operability highlights the exceptional potential of PBAs for high-scalable and low-dimension memristor-based devices integration. Due to their modular composition, PBAs constitute a chemically rich, earth-abundant materials platform whose electronic and ionic properties can be precisely tuned for specific device functions. K-ion intercalation PBA-based memristor devices, with their single-step, aqueous, and room-temperature fabrication, enable low-cost, large-scale processing compatible with CMOS, without any additional post-fabrication processing. Our findings establish PBAs as a new class of intercalation memristors with scalable nanoscale switching and exceptional materials versatility, toward highly integrated neuromorphic and non-volatile memory technologies. This work provides the first demonstration of intercalation-driven resistive switching under ultrafast voltage sweeps, with PW operating up to 200 V/s and PB up to 50 V/s. This unprecedented speed establishes PBAs as a distinct, high-rate class of K-ion intercalation memristors suitable for fast, high-density neuromorphic and memory applications."
+  },
+  {
+    "id": "arxiv_2512.06954v1",
+    "title": "Probing Anharmonic Lattice Dynamics and Thermal Transport in Layered Perovskite LiYTiO4 Anode",
+    "authors": [
+      "Lin Zhang",
+      "Wen Liu",
+      "Mingquan He",
+      "Jun Huang"
+    ],
+    "arxiv_id": "2512.06954v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2512.06954v1",
+    "abstract": "Layered perovskite lithium yttrium titanate ($\\rm LiYTiO_4$) has recently emerged as a promising low-potential, ultrahigh-rate intercalation-type anode material for lithium-ion batteries; however, its lattice dynamics and thermal transport properties remain poorly understood, limiting a complete evaluation of its practical potential. Here, we combine experimental measurements with theoretical modeling to systematically investigate the anharmonic lattice dynamics and heat transport in $\\rm LiYTiO_4$. We employ a neural evolution potential (NEP)-based framework that integrates the temperature-dependent effective potential method with the Wigner thermal transport (WTT) formalism, explicitly including both diagonal and off-diagonal terms of the heat-flux operator. Zero-temperature phonon calculations reveal dynamical instabilities associated with $\\rm TiO_6$ octahedral rotation, which are stabilized at finite temperatures through anharmonic renormalization. Using the WTT approach with contributions from phonon propagation and coherence contributions, we predict a room-temperature lattice thermal conductivity ($κ_{\\rm L}$) of 3.8 $\\rm Wm^{-1}K^{-1}$ averaged over all crystal orientations, in close agreement with the measured value of 3.2 \\pm 0.08 $\\rm Wm^{-1}K^{-1}$ for polycrystalline samples. To further examine the possible influence of ionic motion on high-temperature thermal transport, we compute $κ_{\\rm L}$ using a Green-Kubo equilibrium molecular dynamics approach based on the same NEP, which yields consistent results with both experiment and WTT predictions, confirming the negligible role of Li-ion mobility in heat conduction. Our study not only identifies the ultralow thermal conductivity of $\\rm LiYTiO_4$ as a key limitation for its practical application but also establishes a reliable computational framework for studying thermal properties in battery materials."
+  },
+  {
+    "id": "arxiv_2511.21404v1",
+    "title": "Revealing Fast Ionic Conduction in Solid Electrolytes through Machine Learning Accelerated Raman Calculations",
+    "authors": [
+      "Manuel Grumet",
+      "Takeru Miyagawa",
+      "Olivier Pittet",
+      "Paolo Pegolo",
+      "Karin S. Thalmann",
+      "Waldemar Kaiser",
+      "David A. Egger"
+    ],
+    "arxiv_id": "2511.21404v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2511.21404v1",
+    "abstract": "Fast ionic conduction is a defining property of solid electrolytes for all-solid-state batteries. Previous studies have suggested that liquid-like cation motion associated with fast ionic transport can disrupt crystalline symmetry, thereby lifting Raman selection rules. Here, we exploit the resulting low-frequency, diffusive Raman scattering as a spectral signature of fast ionic conduction and develop a machine learning-accelerated computational pipeline to identify promising solid electrolytes based on this feature. By overcoming the steep computational barriers to calculating Raman spectra of strongly disordered materials at finite temperatures, we achieve near-ab initio accuracy and demonstrate the predictive power of our approach for sodium-ion conductors, revealing clear Raman signatures of liquid-like ion conduction. This work highlights how machine learning can bridge atomistic simulations and experimental observables, enabling data-efficient discovery of fast-ion conductors."
+  },
+  {
+    "id": "arxiv_2510.22041v1",
+    "title": "Highly Efficient Functionalization of hBN with Lithium Oxalate: A Multifunctional Platform for Composites, Ion Transport, and Spin Labeling",
+    "authors": [
+      "Bence G. Márkus",
+      "Anna Nyáry",
+      "Dávid Beke",
+      "Sivaviswa Radhakrishnan",
+      "Vignyatha R. Tatagari",
+      "Bradlee J. McIntosh",
+      "Changlong Chen",
+      "Balázs Zsirka",
+      "Mandefro Y. Teferi",
+      "Jens Niklas",
+      "Oleg G. Poluektov",
+      "Ira D. Bloom",
+      "Fulya Dogan",
+      "Margit Kovács",
+      "Ferenc Simon",
+      "Gábor Szalontai",
+      "Leon Shaw",
+      "László Forró",
+      "Károly Németh"
+    ],
+    "arxiv_id": "2510.22041v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2510.22041v1",
+    "abstract": "The development of multifunctional solid-state materials is key to advancing lithium-ion batteries with enhanced safety and simplified architectures. Here, we report a scalable, highly efficient (near $100\\%$), solvent-free mechanochemical synthesis of hexagonal boron nitride (hBN) functionalized with lithium oxalate (Li$_2$C$_2$O$_4$), yielding a novel lamellar composite that functions both as a lithium-ion conductor and separator. The high-energy milling process promotes exfoliation of hBN and covalent attachment of oxalate groups at edge and defect sites, forming a brown, nanocrystalline material with uniform lithium distribution. The composite exhibits room-temperature ionic and negligible electronic conductivity, thermal stability at least up to $350~^{\\circ}$C, and hosts stable free radicals enabling its use as a spin label. The synthesis produces no byproducts and can be extended towards lithium doping via secondary mechanochemical steps, creating highly doped, chemically stable phases that host additional Li for ionic conduction. These results introduce a new class of lithium-rich, boron nitride-based solids for solid-state batteries, combining ion conduction, mechanical robustness, and thermal resilience in a single material platform."
+  },
+  {
+    "id": "arxiv_2509.20312v2",
+    "title": "4D-QENS Analysis of Correlated Ionic Conduction in SrCl$_2$",
+    "authors": [
+      "Jared Coles",
+      "Omar Chmaissem",
+      "Matthew Krogstad",
+      "Daniel M. Pajerowski",
+      "Feng Ye",
+      "Duck Young Chung",
+      "Mercouri G. Kanatzidis",
+      "Stephan Rosenkranz",
+      "Raymond Osborn"
+    ],
+    "arxiv_id": "2509.20312v2",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2509.20312v2",
+    "abstract": "Methods of elucidating the mechanisms of fast-ion conduction in solid-state materials are pivotal for advancements in energy technologies such as batteries, fuel cells, sensors, and supercapacitors. In this study, we examine the ionic conduction pathways in single crystal SrCl$_2$, which is a fast-ion conductor above 900~K, using four-dimensional Quasi-Elastic Neutron Scattering (4D-QENS). We explore both coherent and incoherent neutron scattering at temperatures above the transition temperature into the superionic phase to explore the correlated motion of hopping anions. Refinements of the incoherent QENS yield residence times and jump probabilities between lattice sites in good agreement with previous studies, confirming that ionic hopping along nearest-neighbor directions is the most probable conduction pathway. However, the coherent QENS reveals evidence of de Gennes narrowing, indicating the importance of ionic correlations in the conduction mechanism. This highlights the need for improvements both in the theory of ionic transport in fluorite compounds and the modeling of coherent 4D-QENS in single crystals."
+  },
+  {
+    "id": "arxiv_2508.04506v1",
+    "title": "$β$-Irida-Graphene: A New 2D Carbon Allotrope for Sodium-Ion Battery Anodes",
+    "authors": [
+      "José A. S. Laranjeira",
+      "Kleuton A. L. Lima",
+      "Nicolas F. Martins",
+      "Luiz A. Ribeiro Junior",
+      "Douglas S. Galvão",
+      "Luis A. Cabral",
+      "Julio R. Sambrano"
+    ],
+    "arxiv_id": "2508.04506v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2508.04506v1",
+    "abstract": "The quest for sustainable and efficient energy storage has driven the exploration of sodium-ion batteries (SIBs) as promising alternatives to lithium-ion systems. However, the larger ionic radius of sodium poses intrinsic challenges such as slow diffusion and structural strain in conventional electrode materials. As a contribution to addressing these limitations, the \\b{eta}-Irida-graphene ($β$-IG) is herein introduced, a novel two-dimensional (2D) carbon allotrope derived from Irida-graphene, featuring a diverse polygonal lattice of 3-, 4-, 6-, 8-, and 9-membered carbon rings. Through density functional theory and ab initio molecular dynamics simulations, $β$-IG demonstrated remarkable thermal, dynamical, and mechanical stability, coupled with intrinsic conductive character and efficient sodium-ion mobility (energy barriers < 0.30 eV). Furthermore, the adsorption of sodium ions was energetically favorable, delivering an impressive predicted specific capacity of 554.5 mAh/g. The reported findings highlight $β$-IG as a good potential anode candidate for next-generation SIBs, offering high-rate performance and structural robustness, and expanding the functional design space for advanced carbon-based electrode materials."
+  },
+  {
+    "id": "arxiv_2507.05626v1",
+    "title": "Uncovering coupled ionic-polaronic dynamics and interfacial enhancement in Li$_x$FePO$_4$",
+    "authors": [
+      "Fengyu Xie",
+      "Yuxiang Gao",
+      "Ruoyu Wang",
+      "Zhicheng Zhong"
+    ],
+    "arxiv_id": "2507.05626v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2507.05626v1",
+    "abstract": "Understanding and controlling coupled ionic-polaronic dynamics is crucial for optimizing electrochemical performance in battery materials. However, studying such coupled dynamics remains challenging due to the intricate interplay between Li-ion configurations, polaron charge ordering, and lattice vibrations. Here, we develop a fine-tuned machine-learned force field (MLFF) for Li$_x$FePO$_4$ that captures coupled ion-polaron behavior. Our simulations reveal picosecond-scale polaron flips occurring orders of magnitude faster than Li-ion migration, featuring strong correlation to Li configurations. Notably, polaron charge fluctuations are further enhanced at Li-rich/Li-poor phase boundaries, suggesting a potential interfacial electronic conduction mechanism. These results demonstrate the capability of fine-tuned MLFFs to resolve complex coupled transport and provide insight into emergent ionic-polaronic dynamics in multivalent battery cathodes."
+  },
+  {
+    "id": "arxiv_2507.04827v1",
+    "title": "Severe Plastic Deformation of Ceramics by High-Pressure Torsion: Review of Principles and Applications",
+    "authors": [
+      "Kaveh Edalati",
+      "Jacqueline Hidalgo-Jiménez",
+      "Thanh Tam Nguyen",
+      "Hadi Sena",
+      "Nariman Enikeev",
+      "Gerda Rogl",
+      "Valery I. Levitas",
+      "Zenji Horita",
+      "Michael J. Zehetbauer",
+      "Ruslan Z. Valiev",
+      "Terence G. Langdon"
+    ],
+    "arxiv_id": "2507.04827v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2507.04827v1",
+    "abstract": "Ceramics are typically brittle at ambient conditions due to their covalent or ionic bonding and limited dislocation activities. While plasticity, and occasionally superplasticity, can be achieved in ceramics at high temperatures through thermally activated phenomena, creep, and grain boundary sliding, their deformation at ambient temperature and pressure remains challenging. Processing under high pressure via the high-pressure torsion (HPT) method offers new pathways for severe plastic deformation (SPD) of ceramics. This article reviews recent advances in HPT processing of ceramics, focusing primarily on traditional ceramics (e.g., oxides, carbides, nitrides, oxynitrides) and to a lesser extent advanced ceramics (e.g., silicon, carbon, perovskites, clathrates). Key structural and microstructural features of SPD-processed ceramics are discussed, including phase transformations and the generation of nanograins and defects such as vacancies and dislocations. The properties and applications of these deformed ceramics are summarized, including powder consolidation, photoluminescence, bandgap narrowing, photovoltaics, photocatalysis (dye degradation, plastic waste degradation, antibiotic degradation, hydrogen production, CO2 conversion), electrocatalysis, thermoelectric performance, dielectric performance, and ion conductivity for Li-ion batteries. Additionally, the article highlights the role of HPT in synthesizing novel materials, such as high-entropy ceramics (particularly high-entropy oxides), black oxides, and high-pressure polymorphs, which hold promise for energy and environmental applications."
+  },
+  {
+    "id": "arxiv_2507.02334v1",
+    "title": "High-Throughput NEB for Li-Ion Conductor Discovery via Fine-Tuned CHGNet Potential",
+    "authors": [
+      "Jingchen Lian",
+      "Xiao Fu",
+      "Xuhe Gong",
+      "Ruijuan Xiao",
+      "Hong Li"
+    ],
+    "arxiv_id": "2507.02334v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2507.02334v1",
+    "abstract": "Solid-state electrolytes are essential in the development of all-solid-state batteries. While density functional theory (DFT)-based nudged elastic band (NEB) and ab initio molecular dynamics (AIMD) methods provide fundamental insights on lithium-ion migration barriers and ionic conductivity, their computational costs make large-scale materials exploration challenging. In this study, we developed a high-throughput NEB computational framework integrated with the fine-tuned universal machine learning interatomic potentials (uMLIPs), enabling accelerated prediction of migration barriers based on transition state theory for the efficient discovery of fast-ion conductors. This framework automates the construction of initial/final states and migration paths, mitigating the inaccurate barriers prediction in pretrained potentials due to the insufficient training data on high-energy states. We employed the fine-tuned CHGNet model into NEB/MD calculations and the dual CHGNet-NEB/MD achieves a balance between computational speed and accuracy, as validated in NASICON-type Li$_{1+x}$Al$_x$Ti$_{2-x}$(PO$_4$)$_3$ (LATP) structures. Through high-throughput screening, we identified orthorhombic Pnma-group structures (LiMgPO$_4$, LiTiPO$_5$, etc.) which can serve as promising frameworks for fast ion conductors. Their aliovalent-doped variants, Li$_{0.5}$Mg$_{0.5}$Al$_{0.5}$PO$_4$ and Li$_{0.5}$TiPO$_{4.5}$F$_{0.5}$, were predicted to possess low activation energies, as well as high ionic conductivity of 0.19 mS/cm and 0.024 mS/cm, respectively."
+  },
+  {
+    "id": "arxiv_2506.17866v1",
+    "title": "Computational Discovery of Metastable NaMnO$_2$ Polymorphs as High-Performance Cathodes with Ultralow Na$^+$ Migration Barriers",
+    "authors": [
+      "Fukuan Wang",
+      "Chen Zhou",
+      "Busheng Wang",
+      "Yong Liu"
+    ],
+    "arxiv_id": "2506.17866v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2506.17866v1",
+    "abstract": "Using an ab initio evolutionary algorithm combined with first-principles calculations, two metastable NaMnO$_2$ polymorphs, $I4_1/amd$ and Cmcm, are identified as promising cathode materials for sodium-ion batteries. Both phases exhibit excellent thermodynamic stability, lying within 35~meV/atom of the ground-state \\textit{Pmmn} phase across 0--50~GPa, and are dynamically and thermally stable under ambient conditions following high-pressure synthesis, as confirmed by phonon and ab initio molecular dynamics simulations. During desodiation, a Jahn--Teller-induced magnetic transition enhances Mn--O hybridization, reduces the bandgap, and promotes robust charge compensation and oxygen retention. Remarkably, the Cmcm phase achieves record-low Na$^+$ migration barriers (0.39~eV at high Na concentration; 0.27~eV at low concentration), representing 47\\% and 36\\% reductions respectively compared to conventional $C2/m$, while delivering a higher average voltage (3.19~V vs 2.88~V). The $I4_1/amd$ phase exhibits concentration-dependent diffusion with a low-energy pathway (0.38~eV) and maintains competitive voltage (2.94~V). These findings suggest that metastable NaMnO$_2$ polymorphs may offer viable alternatives to conventional cathode materials, particularly where fast ionic conduction is required."
+  },
+  {
+    "id": "arxiv_2506.11199v2",
+    "title": "Mechanisms and Stability of Li Dynamics in Amorphous Li-Ti-P-S-Based Mixed Ionic-Electronic Conductors: A Machine Learning Molecular Dynamics Study",
+    "authors": [
+      "Selva Chandrasekaran Selvaraj",
+      "Daiwei Wang",
+      "Donghai Wang",
+      "Anh T. Ngo"
+    ],
+    "arxiv_id": "2506.11199v2",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2506.11199v2",
+    "abstract": "Mixed ionic-electronic conductors (MIECs) exhibit both high ionic and electronic conductivity to improve the battery performance. In this work, we investigate the mechanism and stability of transport channels in our recently developed MIEC material, amorphous Ti-doped lithium phosphorus sulfide (LPS), using molecular dynamics (MD) simulations with a 99\\% accurate machine-learning force field (MLFF) trained on \\textit{ab-initio} MD data. The achieved MLFF helps efficient large-scale MD simulations on LPS with three Ti concentrations (10\\%, 20\\%, and 30\\%) and six temperatures (25$^\\mathrm{o}$C to 225$^\\mathrm{o}$C) to calculate ionic conductivity, activation energy, Li-ion transport mechanism, and configurational entropy. Results show that ionic conductivities and activation energies are consistent with our recent experimental values. Moreover, Li-ion transport occurs via free-volume diffusion facilitated by the formation of disordered Li-S polyhedra. The enhanced stability of transport channels at 10\\% and 20\\% Ti doping, compared to 0\\% and 30\\%, is observed by analyzing the vibrational and configurational entropy of these disordered Li-S polyhedra. Overall, this study highlights the utility of MLFF-based large-scale MD simulations in explaining the transport mechanism and the stability of Li-ion in Ti-doped LPS electrolyte with significant computational efficiency."
+  },
+  {
+    "id": "arxiv_2505.04391v1",
+    "title": "Advancements in Solid-State Sodium-Based Batteries: A Comprehensive Review",
+    "authors": [
+      "Arianna Massaro",
+      "Lorenzo Squillantini",
+      "Francesca De Giorgio",
+      "Francesca A. Scaramuzzo",
+      "Mauro Pasquali",
+      "Sergio Brutti"
+    ],
+    "arxiv_id": "2505.04391v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2505.04391v1",
+    "abstract": "This manuscript explores recent advancements in solid-state sodium-based battery technology, particularly focusing on electrochemical performance and the challenges associated with developing efficient solid electrolytes. The replacement of conventional liquid electrolytes with solid-state alternatives offers numerous benefits, including enhanced safety and environmental sustainability, as solid-state systems reduce flammability and harsh chemical handling. The work emphasizes the importance of structure and interface characteristics in solid electrolytes, which play a critical role in ionic conductivity and overall battery performance. Various classes of solid electrolytes, such as sodium-based anti-perovskites and sulphide electrolytes, are examined, highlighting their unique ionic transport mechanisms and mechanical properties that facilitate stable cycling. The manuscript also discusses strategies to enhance interfacial stability between the anode and the solid electrolyte to mitigate performance degradation during battery operation. Furthermore, advancements in electrode formulations and the integration of novel materials are considered pivotal in optimizing the charging and discharging processes, thus improving the energy and power densities of sodium batteries. The outlook on the future of sodium-based solid-state batteries underscores their potential to meet emerging energy storage demands while leveraging the abundant availability of sodium compared to lithium. This comprehensive review aims to provide insights into ongoing research and prospective directions for the commercialization of solid-state sodium-based batteries, positioning them as viable alternatives in the renewable energy landscape."
+  },
+  {
+    "id": "arxiv_2504.18728v4",
+    "title": "A Unified Predictive and Generative Solution for Liquid Electrolyte Formulation",
+    "authors": [
+      "Zhenze Yang",
+      "Yifan Wu",
+      "Xu Han",
+      "Ziqing Zhang",
+      "Haoen Lai",
+      "Zhenliang Mu",
+      "Tianze Zheng",
+      "Siyuan Liu",
+      "Zhichen Pu",
+      "Zhi Wang",
+      "Zhiao Yu",
+      "Sheng Gong",
+      "Wen Yan"
+    ],
+    "arxiv_id": "2504.18728v4",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2504.18728v4",
+    "abstract": "Liquid electrolytes are critical components of next-generation energy storage systems, enabling fast ion transport, minimizing interfacial resistance, and ensuring electrochemical stability for long-term battery performance. However, measuring electrolyte properties and designing formulations remain experimentally and computationally expensive. In this work, we present a unified framework for designing liquid electrolyte formulation, integrating a forward predictive model with an inverse generative approach. Leveraging both computational and experimental data collected from literature and extensive molecular simulations, we train a predictive model capable of accurately estimating electrolyte properties from ionic conductivity to solvation structure. Our physics-informed architecture preserves permutation invariance and incorporates empirical dependencies on temperature and salt concentration, making it broadly applicable to property prediction tasks across molecular mixtures. Furthermore, we introduce -- to the best of our knowledge -- the first generative machine learning framework for molecular mixture design, demonstrated on electrolyte systems. This framework supports multi-condition-constrained generation, addressing the inherently multi-objective nature of materials design. As a proof of concept, we experimentally identified three liquid electrolytes with both high ionic conductivity and anion-concentrated solvation structure. This unified framework advances data-driven electrolyte design and can be readily extended to other complex chemical systems beyond electrolytes."
+  },
+  {
+    "id": "arxiv_2504.16704v1",
+    "title": "Electronic Paddlewheels Impact the Dynamics of Superionic Conduction in AgI",
+    "authors": [
+      "Harender S. Dhattarwal",
+      "Richard C. Remsing"
+    ],
+    "arxiv_id": "2504.16704v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2504.16704v1",
+    "abstract": "Solid-state ion conductors hold promise as next generation battery materials. To realize their full potential, an understanding of atomic-scale ion conduction mechanisms is needed, including ionic and electronic degrees of freedom. Molecular simulations can create such an understanding, however, including a description of electronic structure necessitates computationally expensive methods that limit their application to small scales. We examine an alternative approach, in which neural network models are used to efficiently sample ionic configurations and dynamics at ab initio accuracy. Then, these configurations are used to determine electronic properties in a post-processing step. We demonstrate this approach by modeling the superionic phase of AgI, in which cation diffusion is coupled to rotational motion of local electron density on the surrounding iodide ions, termed electronic paddlewheels. The neural network potential can capture the many-body effects of electronic paddlewheels on ionic dynamics, but classical force field models cannot. Through an analysis rooted the generalized Langevin equation framework, we find that electronic paddlewheels have a significant impact on the time-dependent friction experienced by a mobile cation. Our approach will enable investigations of electronic fluctuations in materials on large length and time scales, and ultimately the control of ion dynamics through electronic paddlewheels."
+  },
+  {
+    "id": "arxiv_2504.11553v1",
+    "title": "Reconstructions and Dynamics of $β$-Lithium Thiophosphate Surfaces",
+    "authors": [
+      "Hanna Türk",
+      "Davide Tisi",
+      "Michele Ceriotti"
+    ],
+    "arxiv_id": "2504.11553v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2504.11553v1",
+    "abstract": "Lithium thiophosphate (LPS) is a promising solid electrolyte for next-generation lithium-ion batteries due to its superior energy storage, high ionic conductivity, and low-flammability components. Despite its potential, the high reactivity of LPS with common contaminants such as atmospheric water, preparation solvents, and electrode materials poses significant challenges for commercialization. The lack of understanding regarding the structure, morphology, and chemical behavior of LPS's surface slows down the search for solutions to these issues. Here, we utilize a machine learning interatomic potential to achieve a fundamental, atomistic understanding of the mechanical and chemical properties of the $β$-Li$_3$PS$_4$ surfaces. Employing molecular dynamics simulations, we identify relevant surface complexions formed by surface reconstructions, determine their surface energies and compute the Wulff shape of $β$-LPS. The most stable complexions exhibit properties distinctly different from the bulk, including amorphization, increased density, decreased conductivity and large deformation of the structure building blocks. We demonstrate that these surfaces are not static, but undergo significant dynamical activity which is clearly identified by an analysis featuring a time-averaged structural descriptor. Finally, we examine the changes of the electronic structure induced by the surface complexions, which provides us with details on changes in surface reactivity and active sites, underlining the importance to investigate surface complexions under realistic conditions."
+  },
+  {
+    "id": "arxiv_2504.07249v2",
+    "title": "The dynamical role of optical phonons and sub-lattice screening in a solid-state ion conductor",
+    "authors": [
+      "Kim H. Pham",
+      "Vijaya Begum-Hudde",
+      "Amy K. Lin",
+      "Natan A. Spear",
+      "Jackson McClellan",
+      "Michael W. Zuerch",
+      "Andre Schleife",
+      "Kimberly A. See",
+      "Scott Cushing"
+    ],
+    "arxiv_id": "2504.07249v2",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2504.07249v2",
+    "abstract": "Solid-state electrolytes (SSEs) require ionic conductivities that are competitive with liquid electrolytes to realize applications in all-solid state batteries. Although numerous materials have been discovered, the underlying mechanisms enabling superionic conduction remain elusive. In particular, the role of ultrafast lattice dynamics in mediating ion migration, which involves couplings between ions, phonons, and electrons, is rarely explored experimentally at their corresponding timescales. To investigate the contributions of coupled lattice dynamics on ion migration, we modulate the charge density occupations within the crystal, and then measure the time-resolved change in impedance on picosecond timescales for a candidate SSE, Li0.5La0.5TiO3. Upon perturbation, we observe enhanced ion migration at ultrafast timescales that are shorter than laser-induced heating. The respective transients match the timescales of optical and acoustic phonon vibrations, suggesting their involvement in ion migration. We further computationally evaluate the effect of a charge transfer from the O 2p to Ti 3d band on the electronic and physical structure of LLTO. We hypothesize that the charge transfer excitation distorts the TiO6 polyhedra by altering the local charge density occupancy of the hopping site at the migration pathway saddle point, thereby causing a reduction in the migration barrier for the Li+ hop, shown using computation. We rule out the contribution of photogenerated electrons and laser heating. Overall, our investigation introduces a new spectroscopic tool to probe fundamental ion hopping mechanisms transiently at ultrafast timescales, which has previously only been achieved in a time-averaged manner or solely via computational methods. Our proposed technique expands our capability to answer dynamical questions previously limited by incumbent spectroscopic strategies."
+  },
+  {
+    "id": "arxiv_2504.05179v1",
+    "title": "IEC-Independent Coupling Between Water Uptake and Ionic Conductivity in Anion-Conducting Polymer Films",
+    "authors": [
+      "Joan Montes de Oca",
+      "Ruilin Dong",
+      "Gervasio Zaldivar",
+      "Ge Sun",
+      "Zhongyang Wang",
+      "Shrayesh N. Patel",
+      "Paul F. Nealey",
+      "Juan J. de Pablo"
+    ],
+    "arxiv_id": "2504.05179v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2504.05179v1",
+    "abstract": "Anion exchange membranes (AEMs) are promising candidates for replacing proton exchange membranes (PEMs) in electrochemical devices such as fuel cells, electrolyzers, batteries, and osmotic energy extraction systems. However, optimizing the AEM design requires a deeper understanding of the ionic conduction mechanism in the hydrated polymer matrix. This study investigates this mechanism by seeking to understand the relationship between ion exchange capacity (IEC), water absorption, and ionic conductivity in polynorbornene-based thin films. We combine experimental measurements with computational simulations using a newly developed minimal model of the polymer film. Our model is able to reproduce key experimental observations, including water sorption isotherms and ion conduction behavior as a function of relative humidity, and successfully captures the relationship between them. By comparing experimental data with computational results, we explain the commonly reported correlation between conductivity and hydration level and show how the correlation between these variables is affected by the charge density and temperature of the material. Our research advances our understanding of the physical mechanisms that govern the performance of the polyelectrolyte membrane, which is essential for the development of more efficient, stable, and environmentally friendly electrochemical systems."
+  },
+  {
+    "id": "arxiv_2503.11941v1",
+    "title": "Vacancy-induced Modification of Electronic Band Structure of LiBO$_{2}$ Material as Cathode Surface Coating of Lithium-ion Batteries",
+    "authors": [
+      "Ha M. Nguyen",
+      "Carson D. Ziemke",
+      "Narendirakumar Narayanan",
+      "Sebastian Amaya-Roncanci",
+      "John Gahl",
+      "Yangchuan Xing",
+      "Thomas W. Heitmann",
+      "Carlos Wexler"
+    ],
+    "arxiv_id": "2503.11941v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2503.11941v1",
+    "abstract": "LiBO$_{2}$ is an electronic insulator and a promising surface coating for stabilizing high-voltage cathodes in lithium-ion batteries. Despite its potential, the functional mechanisms of this coating remain unclear, particularly the transport of lithium ions and electrons through LiBO$_{2}$ in the presence of lattice vacancies. This understanding is critical for the design and development of LiBO$_{2}$-based materials. In our previous work [Ziemke $\\textit{et al.}$, J. Mater. Chem. A, 2025, $\\textbf{13}$, 3146-3162], we used density functional theory (DFT) calculations to investigate the impact of lattice vacancies on Li-ion transport in both tetragonal (t-LBO) and monoclinic (m-LBO) polymorphs of LiBO$_{2}$, revealing that B vacancies in either polymorph enhanced lithium-ion transport. In this study, we expand on these findings by using DFT calculations to examine the effects of lattice vacancies on the electronic properties of both t-LBO and m-LBO polymorphs,focusing on the electronic band structure. Our analysis shows that B vacancies can enhance the electronic insulation of t-LBO while improving the ionic conduction of m-LBO. The combined results of our previous and current works indicate that B vacancy generation in LiBO$_{2}$ may enable t-LBO to function as a promising solid electrolyte and enhance the performance of m-LBO as a conformal cathode coating in lithium-ion batteries. Overall, generating B vacancies, such as through neutron irradiation, would offer a viable strategy to improve the functionality of LiBO$_{2}$ as a promising material for energy storage applications."
+  },
+  {
+    "id": "arxiv_2502.19085v1",
+    "title": "Quantifying local heterogeneities in the 3D morphology of X-PVMPT battery electrodes based on FIB-SEM measurements",
+    "authors": [
+      "L. Dodell",
+      "M. Neumann",
+      "M. Osenberg",
+      "A. Hilger",
+      "G. Studer",
+      "B. Esser",
+      "I. Manke",
+      "V. Schmidt"
+    ],
+    "arxiv_id": "2502.19085v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2502.19085v1",
+    "abstract": "Organic electrode-active materials (OAMs) not only enable a variety of charge and storage mechanisms, but are also safer for the environment and of lower cost compared to materials in commonly used lithium-ion batteries. Cross-linked Poly(3)-vinyl-N-methylphenothiazine (X-PVMPT) is a p-type OAM which shows high performance and enables fast and reversible energy storage in different battery configurations. The performance of an OAM does not only depend on its molecular or polymer structure, but also on the structure of the composite electrode. The porous nanostructure of an electrode composed of X-PVMPT, a conductive carbon additive and binder is investigated by statistical image analysis, based on 3D image data obtained by focused-ion beam scanning-electron microscopy (FIB-SEM) measurements. Univariate probability distributions of relevant morphological descriptors as well as bivariate distributions of pairs of such descriptors are parametrically modelled, among others, by utilization of copulas in the latter case. These models are then used for quantifying local heterogeneities of X-PVMPT considered in this paper. Furthermore, it is shown that the nanostructure changes when traversing from bottom to top face of the electrode, which influences its performance. While the observed short transportation paths trough the solid phase are beneficial in terms of electrical conductivity, the pathways through the pore phase influencing the effective ionic diffusivity are--in comparison--rather long."
+  },
+  {
+    "id": "arxiv_2502.14234v2",
+    "title": "OBELiX: A Curated Dataset of Crystal Structures and Experimentally Measured Ionic Conductivities for Lithium Solid-State Electrolytes",
+    "authors": [
+      "Félix Therrien",
+      "Jamal Abou Haibeh",
+      "Divya Sharma",
+      "Rhiannon Hendley",
+      "Leah Wairimu Mungai",
+      "Sun Sun",
+      "Alain Tchagang",
+      "Jiang Su",
+      "Samuel Huberman",
+      "Yoshua Bengio",
+      "Hongyu Guo",
+      "Alex Hernández-García",
+      "Homin Shin"
+    ],
+    "arxiv_id": "2502.14234v2",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2502.14234v2",
+    "abstract": "Solid-state electrolyte batteries are expected to replace liquid electrolyte lithium-ion batteries in the near future thanks to their higher theoretical energy density and improved safety. However, their adoption is currently hindered by their lower effective ionic conductivity, a quantity that governs charge and discharge rates. Identifying highly ion-conductive materials using conventional theoretical calculations and experimental validation is both time-consuming and resource-intensive. While machine learning holds the promise to expedite this process, relevant ionic conductivity and structural data is scarce. Here, we present OBELiX, a database of $\\sim$600 synthesized solid electrolyte materials and their experimentally measured room temperature ionic conductivities gathered from literature and curated by domain experts. Each material is described by their measured composition, space group and lattice parameters. A full-crystal description in the form of a crystallographic information file (CIF) is provided for $\\sim$320 structures for which atomic positions were available. We discuss various statistics and features of the dataset and provide training and testing splits carefully designed to avoid data leakage. Finally, we benchmark seven existing ML models on the task of predicting ionic conductivity and discuss their performance. The goal of this work is to facilitate the use of machine learning for solid-state electrolyte materials discovery."
+  },
+  {
+    "id": "arxiv_2502.09970v1",
+    "title": "Universal Machine Learning Interatomic Potentials are Ready for Solid Ion Conductors",
+    "authors": [
+      "Hongwei Du",
+      "Jian Hui",
+      "Lanting Zhang",
+      "Hong Wang"
+    ],
+    "arxiv_id": "2502.09970v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2502.09970v1",
+    "abstract": "With the rapid development of energy storage technology, high-performance solid-state electrolytes (SSEs) have become critical for next-generation lithium-ion batteries. These materials require high ionic conductivity, excellent electrochemical stability, and good mechanical properties to meet the demands of electric vehicles and portable electronics. However, traditional methods like density functional theory (DFT) and empirical force fields face challenges such as high computational costs, poor scalability, and limited accuracy across material systems. Universal machine learning interatomic potentials (uMLIPs) offer a promising solution with their efficiency and near-DFT-level accuracy.This study systematically evaluates six advanced uMLIP models (MatterSim, MACE, SevenNet, CHGNet, M3GNet, and ORBFF) in terms of energy, forces, thermodynamic properties, elastic moduli, and lithium-ion diffusion behavior. The results show that MatterSim outperforms others in nearly all metrics, particularly in complex material systems, demonstrating superior accuracy and physical consistency. Other models exhibit significant deviations due to issues like energy inconsistency or insufficient training data coverage.Further analysis reveals that MatterSim achieves excellent agreement with reference values in lithium-ion diffusivity calculations, especially at room temperature. Studies on Li3YCl6 and Li6PS5Cl uncover how crystal structure, anion disorder levels, and Na/Li arrangements influence ionic conductivity. Appropriate S/Cl disorder levels and optimized Na/Li arrangements enhance diffusion pathway connectivity, improving overall ionic transport performance."
+  },
+  {
+    "id": "arxiv_2502.09013v1",
+    "title": "Exploration of Zeolites as High-Performance Electrode Protective Layers for Alkali-Metal Batteries",
+    "authors": [
+      "Lina Wang",
+      "Guangfu Luo"
+    ],
+    "arxiv_id": "2502.09013v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2502.09013v1",
+    "abstract": "The electrode-electrolyte interfaces play pivotal roles in alkali-metal batteries, necessitating superior electrochemical stability, excellent electrical insulation, and high ionic conductivity. This study proposes using zeolites as interfacial protective layers owing to their inherently high stability with both alkali metals and high-voltage cathodes, as well as exceptionally wide bandgaps that minimize electron transport. To further pinpoint zeolites with rapid ionic diffusivity among their versatile structures, we devise a universal approach to explore diffusion dynamics in arbitrary structures. Through first-principles calculations, we identify the diffusion networks of Li+, Na+, and K+ in twenty-two, seventeen, and four zeolites, respectively. Eventually, we predict five, seven, and three zeolites as suitable interfacial protective layer for lithium-, sodium-, and potassium-metal batteries, respectively, each characterized by a diffusion barrier below 0.3 eV. This research automates the exploration of diffusion dynamics in complex materials and underscores the significant potential of zeolites as interfacial protective layers in alkali-metal batteries."
+  },
+  {
+    "id": "arxiv_2502.07947v1",
+    "title": "Local doping of an oxide semiconductor by voltage-driven splitting of anti-Frenkel defects",
+    "authors": [
+      "Jiali He",
+      "Ursula Ludacka",
+      "Kasper A. Hunnestad",
+      "Didrik R. Småbråten",
+      "Konstantin Shapovalov",
+      "Per Erik Vullum",
+      "Constantinos Hatzoglou",
+      "Donald M. Evans",
+      "Erik D. Roede",
+      "Zewu Yan",
+      "Edith Bourret",
+      "Sverre M. Selbach",
+      "David Gao",
+      "Jaakko Akola",
+      "Dennis Meier"
+    ],
+    "arxiv_id": "2502.07947v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2502.07947v1",
+    "abstract": "Layered oxides exhibit high ionic mobility and chemical flexibility, attracting interest as cathode materials for lithium-ion batteries and the pairing of hydrogen production and carbon capture. Recently, layered oxides emerged as highly tunable semiconductors. For example, by introducing anti-Frenkel defects, the electronic hopping conductance in hexagonal manganites was increased locally by orders of magnitude. Here, we demonstrate local acceptor and donor doping in Er(Mn,Ti)O$_3$, facilitated by the splitting of such anti-Frenkel defects under applied d.c. voltage. By combining density functional theory calculations, scanning probe microscopy, atom probe tomography, and scanning transmission electron microscopy, we show that the oxygen defects readily move through the layered crystal structure, leading to nano-sized interstitial-rich (p-type) and vacancy-rich (n-type) regions. The resulting pattern is comparable to dipolar npn-junctions and stable on the timescale of days. Our findings reveal the possibility of temporarily functionalizing oxide semiconductors at the nanoscale, giving additional opportunities for the field of oxide electronics and the development of transient electronics in general."
+  },
+  {
+    "id": "arxiv_2501.15161v1",
+    "title": "Iron-Arsenide monolayer as an anode materials for Lithium-ion batteries: A first-principles study",
+    "authors": [
+      "Ajay Kumar",
+      "Prakash Parida"
+    ],
+    "arxiv_id": "2501.15161v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2501.15161v1",
+    "abstract": "This theoretical investigation delves into the structural, electronic, and electrochemical properties of two hexagonal iron-arsenide monolayers, 1T-FeAs and 1H-FeAs, focusing on their potential as anode materials for Lithium-ion batteries. Previous studies have highlighted the ferromagnetic nature of 1T-FeAs at room temperature.Our calculations reveal that both phases exhibit metallic behaviour with spin-polarized electronic band structures. Electrochemical studies show that the 1T-FeAs monolayer has better ionic conductivity for Li ions than the 1H-FeAs phase, attributed to a lower activation barrier of 0.38 eV. This characteristic suggests a faster charge/discharge rate. Both FeAs phases exhibit comparable theoretical capacities 374 mAh/g, outperforming commercial graphite anodes. The average open-circuit voltage for maximum Li atom adsorption is 0.61 V for 1H-FeAs and 0.44 V for 1T-FeAs. The volume expansion over the maximum adsorption of Li atoms on both phases is also remarkably less than the commercially used anode material such as graphite. Further, the adsorption of Li atoms onto 1H-FeAs induces a remarkable transition from ferromagnetism to anti-ferromagnetism, with minimal impact on the electronic band structure. In contrast, the original state of 1T-FeAs remains unaffected by Li adsorption. To summarize, the potential of both 1T-FeAs and 1H-FeAs monolayers as promising anode materials for Lithium-ion batteries, offering valuable insights into their electrochemical performance and phase transition behaviour upon Li adsorption."
+  },
+  {
+    "id": "arxiv_2501.10567v1",
+    "title": "Polymer-based solid-state electrolytes for lithium sulfur batteries",
+    "authors": [
+      "Praveen Balaji T",
+      "Soumyadip Choudhury",
+      "Ernesto E. Marinero"
+    ],
+    "arxiv_id": "2501.10567v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2501.10567v1",
+    "abstract": "Lithium-sulfur (Li-S) batteries offer substantial theoretical energy density gains over Li-ion bat-teries, a crucial factor for transportation electrification. In addition, sulfur is an earth-abundant, inexpensive material obtainable from multiple resources; thus, Li-S batteries are envisioned to provide environmentally sustainable solutions to the growing demand for energy storage. A crit-ical roadblock to the realization of commercial Li-S batteries is the formation of polysulfides and their secondary reactions with liquid organic electrolytes, resulting in low coulombic efficiency for charging and fast self-discharge rates. The realization of solid-state electrolytes for Li-S bat-teries provides potential pathways to address the safety concerns of liquid electrolytes and inhib-it the formation of polysulfides and/or prevent their diffusion into the anode electrode. However, current solid-state electrolytes are limited by low ionic conductivity, inadequate electrode inter-facial compatibility, and restricted electrochemical windows. This review discusses the status of polymer-based electrolytes for Li-S batteries, and outlines current methods for their fabrication, their transport characteristics and ongoing research aimed at overcoming material properties hindering the development of all-solid-state Li-S batteries."
+  },
+  {
+    "id": "arxiv_2501.03165v1",
+    "title": "Synthetic accessibility and sodium ion conductivity of the Na$_{8-x}$A$^{x}$P$_2$O$_9$ (NAP) high-temperature sodium superionic conductor framework",
+    "authors": [
+      "Lauren N. Walters",
+      "Yuxing Fei",
+      "Bernardus Rendy",
+      "Xiaochen Yang",
+      "Mouhamad Diallo",
+      "KyuJung Jun",
+      "Grace Wei",
+      "Matthew J. McDermott",
+      "Andrea Giunto",
+      "Tara Mishra",
+      "Fengyu Shen",
+      "David Milsted",
+      "May Sabai Oo",
+      "Haegyeom Kim",
+      "Michael C. Tucker",
+      "Gerbrand Ceder"
+    ],
+    "arxiv_id": "2501.03165v1",
+    "year": 2025,
+    "url": "http://arxiv.org/abs/2501.03165v1",
+    "abstract": "Advancement of solid state electrolytes (SSEs) for all solid state batteries typically focuses on modification of a parent structural framework for improved conductivity, \\textit{e.g.} cation substitution for an immobile ion or varying the concentration of the mobile ion. Therefore, novel frameworks can be disruptive by enabling fast ion conduction aided by different structure and diffusion mechanisms, and unlocking optimal conductors with different properties (\\textit{e.g.} mechanical properties, sintering needs, electrochemical stability) than previously published. Herein, we perform a high throughput survey of an understudied structural framework for sodium ion conduction, Na$_{8-x}$A$^x$P$_2$O$_9$ (NAP), to understand the family's thermodynamic stability, synthesizability, and ionic conduction. We first show that the parent phase Na$_4$TiP$_2$O$_9$ (NTP) undergoes a structural distortion (with accompanying conductivity transition) due to unstable phonons from a pseduo-Jahn Teller mode in the 1D titanium chains. Then, screening of cation-substituted structural candidates with \\textit{ab initio} and machine-learned potential calculations reveal a number of candidates that are thermodynamically stable, likely synthesizable, and have high predicted ionic conductivities. High throughput experimental trials and subsequent methodology optimization of one Na$_4$SnP$_2$O$_9$ (NSP) highlight collective challenges to the synthesis pathways for sodium phosphate materials via solid state synthesis. Our results demonstrate that NAP is a highly tunable conduction framework whose high temperature conductivity transition has heretofore eliminated it from significant research interest. By expanding the structural toolkit for SSE design, we increase the number of useful sodium ion electrolytes for integration into safe and accessible solid state batteries."
+  }
+]

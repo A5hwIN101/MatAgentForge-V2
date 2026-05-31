@@ -3,11 +3,12 @@
 import { type FormEvent, useState } from "react";
 
 type InputBoxProps = {
+  chatId: string | null;
   disabled?: boolean;
-  onSubmit: (formula: string) => void | Promise<void>;
+  onSubmit: (chatId: string | null, formula: string) => void | Promise<void>;
 };
 
-export function InputBox({ disabled = false, onSubmit }: InputBoxProps) {
+export function InputBox({ chatId, disabled = false, onSubmit }: InputBoxProps) {
   const [value, setValue] = useState("");
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -17,7 +18,7 @@ export function InputBox({ disabled = false, onSubmit }: InputBoxProps) {
       return;
     }
 
-    await onSubmit(formula);
+    await onSubmit(chatId, formula);
     setValue("");
   };
 
@@ -39,7 +40,7 @@ export function InputBox({ disabled = false, onSubmit }: InputBoxProps) {
         disabled={disabled}
         className="h-12 rounded-full bg-emerald-400 px-6 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {disabled ? "Screening..." : "Analyze"}
+        {disabled ? "Analyzing..." : "Analyze"}
       </button>
     </form>
   );

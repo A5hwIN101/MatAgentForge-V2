@@ -3,14 +3,11 @@
 import { TraceDrawer } from "@/components/TraceDrawer";
 import type { CritiqueCard as CritiqueCardType } from "@/types";
 
-type FeedbackAction = "approve" | "reject" | "modify";
-
 type CritiqueCardProps = {
   critique: CritiqueCardType;
-  onFeedback: (action: FeedbackAction, reason?: string) => void;
 };
 
-export function CritiqueCard({ critique, onFeedback }: CritiqueCardProps) {
+export function CritiqueCard({ critique }: CritiqueCardProps) {
   return (
     <article className="w-full max-w-3xl rounded-[2rem] border border-slate-800 bg-slate-900/85 p-6 shadow-2xl shadow-slate-950/40 backdrop-blur">
       <header className="border-b border-slate-800 pb-5">
@@ -89,32 +86,6 @@ export function CritiqueCard({ critique, onFeedback }: CritiqueCardProps) {
           <TraceDrawer trace={critique.trace} />
         </div>
       </section>
-
-      <footer className="border-t border-slate-800 pt-5">
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => onFeedback("approve")}
-            className="rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
-          >
-            APPROVE
-          </button>
-          <button
-            type="button"
-            onClick={() => onFeedback("reject")}
-            className="rounded-full border border-rose-500/60 px-5 py-2.5 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/10"
-          >
-            REJECT
-          </button>
-          <button
-            type="button"
-            onClick={() => onFeedback("modify")}
-            className="rounded-full border border-sky-500/60 px-5 py-2.5 text-sm font-semibold text-sky-200 transition hover:bg-sky-500/10"
-          >
-            MODIFY
-          </button>
-        </div>
-      </footer>
     </article>
   );
 }
