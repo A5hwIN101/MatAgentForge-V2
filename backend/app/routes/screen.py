@@ -2,12 +2,14 @@ import asyncio
 from typing import Annotated
 from uuid import uuid4
 
+import groq
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
+from app.graph.workflow import run_screening_workflow
 from app.services.chat_service import ChatService
 from app.streaming.sse import SSEEmitter
 
@@ -35,147 +37,45 @@ async def screen_material(
     run_id = str(uuid4())
 
     async def event_stream():
-        yield SSEEmitter.build_event(
-            event="screen.started",
-            chat_id=chat_id,
-            run_id=run_id,
-            data={"formula": payload.formula},
-        )
-        await asyncio.sleep(1)
+        queue: asyncio.Queue[str | None] = asyncio.Queue()
 
-        yield SSEEmitter.build_event(
-            event="step.started",
-            chat_id=chat_id,
-            run_id=run_id,
-            data={"step": "load_domain_rules", "status": "started"},
-        )
-        await asyncio.sleep(1)
-        yield SSEEmitter.build_event(
-            event="step.updated",
-            chat_id=chat_id,
-            run_id=run_id,
-            data={
-                "step": "load_domain_rules",
-                "label": "⚙ Loading domain rules...",
-                "status": "in_progress",
-            },
-        )
-        await asyncio.sleep(2)
-
-        yield SSEEmitter.build_event(
-            event="step.started",
-            chat_id=chat_id,
-            run_id=run_id,
-            data={"step": "candidate_analysis", "status": "started"},
-        )
-        await asyncio.sleep(1)
-        yield SSEEmitter.build_event(
-            event="step.updated",
-            chat_id=chat_id,
-            run_id=run_id,
-            data={
-                "step": "candidate_analysis",
-                "label": f"🔍 Screening {payload.formula}...",
-                "status": "in_progress",
-            },
-        )
-        await asyncio.sleep(2)
-
-        yield SSEEmitter.build_event(
-            event="step.started",
-            chat_id=chat_id,
-            run_id=run_id,
-            data={"step": "critique_generation", "status": "started"},
-        )
-        await asyncio.sleep(1)
-        yield SSEEmitter.build_event(
-            event="step.updated",
-            chat_id=chat_id,
-            run_id=run_id,
-            data={
-                "step": "critique_generation",
-                "label": "⚠ Running critique...",
-                "status": "in_progress",
-            },
-        )
-        await asyncio.sleep(2)
-
-        explanation_words = (
-            "LiCoO2 remains feasible but carries cobalt cost risk and thermal safety concerns."
-        ).split()
-        for word in explanation_words:
-            yield SSEEmitter.build_event(
-                event="text.delta",
-                chat_id=chat_id,
-                run_id=run_id,
-                data={"delta": f"{word} "},
+        async def emit_event(event: str, data: dict) -> None:
+            await queue.put(
+                SSEEmitter.build_event(
+                    event=event,
+                    chat_id=chat_id,
+                    run_id=run_id,
+                    data=data,
+                )
             )
-            await asyncio.sleep(1)
 
-        yield SSEEmitter.build_event(
-            event="critique.ready",
-            chat_id=chat_id,
-            run_id=run_id,
-            data={
-                "id": f"crit_{uuid4()}",
-                "material_formula": payload.formula,
-                "verdict": "Feasible with concerns",
-                "score": 7.2,
-                "domain_rules_passed": 3,
-                "domain_rules_total": 3,
-                "flags": [
-                    {
-                        "icon": "⚠",
-                        "text": "Co scarcity — cost risk at scale",
-                        "severity": "warning",
-                    },
-                    {
-                        "icon": "⚠",
-                        "text": "Thermal runaway above 150°C",
-                        "severity": "warning",
-                    },
-                    {
-                        "icon": "✅",
-                        "text": "Ionic conductivity — strong",
-                        "severity": "success",
-                    },
-                ],
-                "suggestions": [
-                    {
-                        "text": "Substitute Ni-Mn for Co (NMC path)",
-                        "rationale": "Reduce cobalt dependency while preserving cathode performance.",
-                    },
-                    {
-                        "text": "Add thermal management constraint",
-                        "rationale": "Account for elevated temperature safety risks in screening.",
-                    },
-                ],
-                "explanation": "LiCoO2 remains feasible but requires explicit handling of cost and thermal safety tradeoffs.",
-                "trace": {
-                    "rules_matched": [
-                        "high_ionic_conductivity",
-                        "cobalt_scarcity_penalty",
-                        "thermal_runaway_guardrail",
-                    ],
-                    "contradictions": [],
-                    "citations": [
-                        {
-                            "rule_id": "high_ionic_conductivity",
-                            "source": "mock_materials_project_rulepack",
-                            "confidence": 0.92,
-                        }
-                    ],
-                },
-            },
-        )
-        await asyncio.sleep(1)
+        async def run_workflow() -> None:
+            await emit_event("screen.started", {"formula": payload.formula})
+            try:
+                await run_screening_workflow(
+                    chat_id=chat_id,
+                    run_id=run_id,
+                    material_formula=payload.formula,
+                    emit_event=emit_event,
+                )
+                await emit_event("screen.completed", {"status": "completed"})
+            except (groq.APIError, groq.APITimeoutError, groq.APIConnectionError) as error:
+                await emit_event("screen.failed", {"error": str(error)})
+            except Exception as error:
+                await emit_event("screen.failed", {"error": str(error)})
+            finally:
+                await queue.put(None)
 
-        yield SSEEmitter.build_event(
-            event="screen.completed",
-            chat_id=chat_id,
-            run_id=run_id,
-            data={"status": "completed"},
-        )
+        workflow_task = asyncio.create_task(run_workflow())
+
+        try:
+            while True:
+                item = await queue.get()
+                if item is None:
+                    break
+                yield item
+        finally:
+            await workflow_task
 
     return StreamingResponse(
         event_stream(),

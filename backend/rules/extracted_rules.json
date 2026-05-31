@@ -1,0 +1,20 @@
+[
+  {
+    "id": "cobalt_scarcity_penalty",
+    "name": "Cobalt Scarcity Penalty",
+    "description": "Materials with high cobalt dependence should be flagged for supply-chain and cost risk at production scale.",
+    "severity": "warning"
+  },
+  {
+    "id": "thermal_runaway_guardrail",
+    "name": "Thermal Runaway Guardrail",
+    "description": "Materials with elevated thermal instability should be flagged when safety margins are narrow for battery pack deployment.",
+    "severity": "warning"
+  },
+  {
+    "id": "high_ionic_conductivity",
+    "name": "High Ionic Conductivity Benefit",
+    "description": "Materials with strong lithium-ion transport characteristics should be recognized as a positive performance signal.",
+    "severity": "success"
+  }
+]
