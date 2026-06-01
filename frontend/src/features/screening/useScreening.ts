@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { API_BASE_URL } from "@/lib/api";
 import type {
   CritiqueCard,
   ScreenEvent,
@@ -9,8 +10,6 @@ import type {
   StreamStatus,
   WorkflowStep,
 } from "@/types";
-
-const BACKEND_URL = "http://localhost:8000";
 
 const WORKFLOW_STEP_ORDER: Array<Pick<WorkflowStep, "id" | "number" | "title">> = [
   { id: "candidate_analysis", number: "01", title: "Parse Material" },
@@ -194,7 +193,7 @@ function buildWorkflowSteps(
   return steps;
 }
 
-export function useScreening(apiBaseUrl = BACKEND_URL): UseScreeningResult {
+export function useScreening(apiBaseUrl = API_BASE_URL): UseScreeningResult {
   const [state, setState] = useState<ScreeningState>(initialState);
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const activeRequestIdRef = useRef<string | null>(null);

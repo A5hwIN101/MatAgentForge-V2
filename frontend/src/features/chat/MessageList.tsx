@@ -7,14 +7,13 @@ import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { ReasoningTimeline } from "@/components/ReasoningTimeline";
 import { TraceDrawer } from "@/components/TraceDrawer";
 import { FeedbackActions } from "@/features/feedback/FeedbackActions";
+import { API_BASE_URL } from "@/lib/api";
 import type {
   ChatItem,
   CritiqueCard as CritiqueCardType,
   ScreeningErrorCard,
   WorkflowStep,
 } from "@/types";
-
-const BACKEND_URL = "http://localhost:8000";
 
 type MessageListProps = {
   messages: ChatItem[];
@@ -150,7 +149,7 @@ export function MessageList({
   ) => {
     setFeedbackError("");
 
-    const response = await fetch(`${BACKEND_URL}/api/critiques/${critiqueId}/feedback`, {
+    const response = await fetch(`${API_BASE_URL}/api/critiques/${critiqueId}/feedback`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

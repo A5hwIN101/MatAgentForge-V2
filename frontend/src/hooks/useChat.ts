@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { API_BASE_URL } from "@/lib/api";
 import type { Chat, ChatDetail, ChatItem } from "@/types";
 
 type UseChatResult = {
@@ -52,8 +53,6 @@ type ServerChatDetail = {
   chat?: ServerChat;
   items?: ServerChatItem[];
 };
-
-const BACKEND_URL = "http://localhost:8000";
 
 function mapChat(serverChat: ServerChat): Chat {
   return {
@@ -148,7 +147,7 @@ function resequenceItems(items: ChatItem[]): ChatItem[] {
   }));
 }
 
-export function useChat(apiBaseUrl = BACKEND_URL): UseChatResult {
+export function useChat(apiBaseUrl = API_BASE_URL): UseChatResult {
   const [chats, setChats] = useState<Chat[]>([]);
   const [chatDetails, setChatDetails] = useState<Record<string, ChatDetail>>({});
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
