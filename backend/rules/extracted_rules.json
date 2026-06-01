@@ -6,9 +6,17 @@
     "severity": "warning",
     "threshold_value": null,
     "threshold_unit": null,
-    "citations": [],
+    "citations": [
+      {
+        "doi": "10.1016/j.jpowsour.2022.231873",
+        "paper_title": "Cobalt in high-energy-density layered cathode materials for lithium ion batteries",
+        "authors": "Binbin Chu, Yu-Jie Guo, Ji-Lei Shi, Ya-Xia Yin, Tao Huang, Hang Su, Aishui Yu, Yu-Guo Guo, Yangxing Li",
+        "year": 2022,
+        "url": "https://doi.org/10.1016/j.jpowsour.2022.231873"
+      }
+    ],
     "domain": "general screening",
-    "evidence_from_paper": ""
+    "evidence_from_paper": "Cobalt-based layered oxides remain high-performing commercial cathodes, but cobalt scarcity, uneven geographic distribution, and cost volatility create a persistent scale-up risk."
   },
   {
     "id": "thermal_runaway_guardrail",
@@ -31,6 +39,155 @@
     "citations": [],
     "domain": "general screening",
     "evidence_from_paper": ""
+  },
+  {
+    "id": "licoo2_layered_cathode_baseline",
+    "name": "LiCoO2 Commercial Layered Cathode Baseline",
+    "description": "LiCoO2 is a layered oxide commercial cathode with strong volumetric energy density and mature manufacturing relevance.",
+    "severity": "success",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "material_scope": [
+      "LiCoO2"
+    ],
+    "match_reasoning": "Candidate is LiCoO2, a commercially established layered oxide cathode with strong volumetric energy density and broad manufacturing precedent.",
+    "citations": [
+      {
+        "doi": "10.1016/j.jpowsour.2022.231873",
+        "paper_title": "Cobalt in high-energy-density layered cathode materials for lithium ion batteries",
+        "authors": "Binbin Chu, Yu-Jie Guo, Ji-Lei Shi, Ya-Xia Yin, Tao Huang, Hang Su, Aishui Yu, Yu-Guo Guo, Yangxing Li",
+        "year": 2022,
+        "url": "https://doi.org/10.1016/j.jpowsour.2022.231873"
+      }
+    ],
+    "domain": "layered oxide commercial cathodes",
+    "evidence_from_paper": "LiCoO2 remains the dominant cathode in 3C batteries because of its high operating voltage, high energy density, high compacted density, and mature commercial manufacturing base."
+  },
+  {
+    "id": "licoo2_delithiation_thermal_instability",
+    "name": "LiCoO2 Delithiation Thermal Instability Concern",
+    "description": "LiCoO2 should be flagged for thermal runaway and oxygen-release risk under highly delithiated or abuse conditions.",
+    "severity": "warning",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "material_scope": [
+      "LiCoO2"
+    ],
+    "match_reasoning": "Candidate is LiCoO2, so its well-documented thermal instability under deep delithiation and abuse conditions is directly relevant to feasibility risk.",
+    "citations": [
+      {
+        "doi": "10.1016/j.apenergy.2012.05.064",
+        "paper_title": "Thermal runaway potential of LiCoO2 and Li(Ni1/3Co1/3Mn1/3)O2 batteries determined with adiabatic calorimetry methodology",
+        "authors": "Yih-Wen Wang, Chia-Yuan Wen, Chi-Min Shu",
+        "year": 2012,
+        "url": "https://doi.org/10.1016/j.apenergy.2012.05.064"
+      }
+    ],
+    "domain": "battery thermal safety",
+    "evidence_from_paper": "Adiabatic calorimetry shows that LiCoO2 cells have thermal runaway potential under abuse conditions, making delithiation-driven heat release and oxygen evolution a practical safety concern."
+  },
+  {
+    "id": "lifepo4_olivine_safety_baseline",
+    "name": "LiFePO4 Olivine Safety Baseline",
+    "description": "LiFePO4 is an olivine phosphate cathode with strong structural stability, safety characteristics, and cobalt-free cost advantages.",
+    "severity": "success",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "material_scope": [
+      "LiFePO4"
+    ],
+    "match_reasoning": "Candidate is LiFePO4, an olivine phosphate cathode known for structural robustness, safety, and cobalt-free commercial attractiveness.",
+    "citations": [
+      {
+        "doi": "10.1149/1.1837571",
+        "paper_title": "Phospho-olivines as Positive-Electrode Materials for Rechargeable Lithium Batteries",
+        "authors": "A. K. Padhi, K. S. Nanjundaswamy, John B. Goodenough",
+        "year": 1997,
+        "url": "https://doi.org/10.1149/1.1837571"
+      },
+      {
+        "doi": "10.1039/C4EE04016C",
+        "paper_title": "Olivine LiFePO4: development and future",
+        "authors": "Jiajun Wang, Xueliang Sun",
+        "year": 2015,
+        "url": "https://doi.org/10.1039/C4EE04016C"
+      }
+    ],
+    "domain": "olivine phosphate cathodes",
+    "evidence_from_paper": "LiFePO4 is widely regarded as a promising cathode because of its environmental friendliness, high cycling performance, safety characteristics, and cobalt-free phosphate framework."
+  },
+  {
+    "id": "lifepo4_energy_density_tradeoff",
+    "name": "LiFePO4 Energy Density Tradeoff",
+    "description": "LiFePO4 should be flagged for lower energy density and transport limitations relative to layered oxide cathodes in energy-constrained applications.",
+    "severity": "warning",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "material_scope": [
+      "LiFePO4"
+    ],
+    "match_reasoning": "Candidate is LiFePO4, so its lower energy density and transport-related tradeoffs versus layered oxides remain directly relevant for feasibility screening.",
+    "citations": [
+      {
+        "doi": "10.1016/j.jpowsour.2010.11.113",
+        "paper_title": "Structure and performance of LiFePO4 cathode materials: A review",
+        "authors": "Wei-Jun Zhang",
+        "year": 2011,
+        "url": "https://doi.org/10.1016/j.jpowsour.2010.11.113"
+      }
+    ],
+    "domain": "olivine phosphate cathode tradeoffs",
+    "evidence_from_paper": "LiFePO4 still faces low electronic conductivity, modest ionic diffusivity, and lower attainable energy density than layered oxides, so pack-level energy tradeoffs remain important."
+  },
+  {
+    "id": "nmc_layered_high_energy_benefit",
+    "name": "NMC Layered High-Energy Benefit",
+    "description": "Layered NMC cathodes provide attractive energy density and a practical transition-metal balance for commercial lithium-ion batteries.",
+    "severity": "success",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "material_scope": [
+      "Li(Ni,Mn,Co)O2",
+      "LiNiMnCoO2",
+      "LiMnCoNiO2"
+    ],
+    "match_reasoning": "Candidate is an NMC layered oxide cathode, so its strong energy-density profile and balanced transition-metal design are directly relevant benefits.",
+    "citations": [
+      {
+        "doi": "10.1007/s41918-019-00053-3",
+        "paper_title": "Developments and challenges of LiNi_xCo_yMn_zO_2 cathode materials for lithium-ion batteries",
+        "authors": "Tianyu Li, Xiao-Zi Yuan, Lei Zhang, Datong Song, Kaiyuan Shi, Christina Bock",
+        "year": 2020,
+        "url": "https://doi.org/10.1007/s41918-019-00053-3"
+      }
+    ],
+    "domain": "layered NMC cathodes",
+    "evidence_from_paper": "NMC cathodes combine the high capacity contribution of nickel with cobalt and manganese support for layered-structure integrity, making them high-energy commercial cathodes."
+  },
+  {
+    "id": "nmc_transition_metal_tradeoff",
+    "name": "NMC Transition-Metal Tradeoff Concern",
+    "description": "NMC cathodes should be flagged for nickel-driven degradation, thermal-safety tradeoffs, and cobalt or nickel supply-chain pressure that depend on composition balance.",
+    "severity": "warning",
+    "threshold_value": null,
+    "threshold_unit": null,
+    "material_scope": [
+      "Li(Ni,Mn,Co)O2",
+      "LiNiMnCoO2",
+      "LiMnCoNiO2"
+    ],
+    "match_reasoning": "Candidate is an NMC cathode, so transition-metal balance, nickel-linked degradation, thermal safety, and Co/Ni sourcing tradeoffs are directly relevant concerns.",
+    "citations": [
+      {
+        "doi": "10.1039/D3YA00631J",
+        "paper_title": "Challenges and opportunities using Ni-rich layered oxide cathodes in Li-ion rechargeable batteries: the case of nickel cobalt manganese oxides",
+        "authors": "Jitendra Pal Singh, Harsha Devnani, Aditya Sharma, Weon Cheol Lim, Archana Dhyani, Keun Hwa Chae, Sangsul Lee",
+        "year": 2024,
+        "url": "https://doi.org/10.1039/D3YA00631J"
+      }
+    ],
+    "domain": "NMC degradation and supply tradeoffs",
+    "evidence_from_paper": "NMC cathodes face composition-dependent structural degradation, capacity-retention loss, lower thermal stability at higher nickel content, and persistent cobalt or nickel supply-chain pressure."
   },
   {
     "id": "material_property_combinations_for_which_magnetic_field_influenc",
