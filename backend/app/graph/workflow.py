@@ -39,6 +39,14 @@ SYSTEM_PROMPT_CRITIQUE = (
     "You are a battery materials expert. Given this candidate, rule set, violations, and contradictions, "
     "generate strict JSON with keys verdict, score, flags, suggestions, explanation. "
     "Verdict must be one of feasible, feasible_with_concerns, infeasible. "
+    "Score means screening risk / feasibility risk where lower is more viable. "
+    "Use this rubric: 0-1 = strong known battery material with low feasibility risk; "
+    "2-3 = feasible with minor tradeoffs; "
+    "4-5 = feasible with meaningful concerns; "
+    "6-7 = uncertain or weak candidate; "
+    "8-10 = likely infeasible or high-risk. "
+    "Keep verdict and score consistent: feasible should usually score 0-3, "
+    "feasible_with_concerns should usually score 3-5, infeasible should usually score 8-10. "
     "Flags must be a list of objects with icon, text, severity. "
     "Suggestions must be a list of objects with text and rationale."
 )
@@ -295,6 +303,25 @@ def parse_batched_contradictions(
         seen_pairs.add(pair)
 
     return contradictions
+
+
+def normalize_critique_score(score: Any, verdict: Any) -> float:
+    try:
+        numeric_score = float(score)
+    except (TypeError, ValueError):
+        numeric_score = 0.0
+
+    normalized_verdict = str(verdict or "").strip().lower().replace(" ", "_")
+    clamped_score = max(0.0, min(10.0, numeric_score))
+
+    verdict_ranges = {
+        "feasible": (0.0, 3.0),
+        "feasible_with_concerns": (3.0, 5.0),
+        "infeasible": (8.0, 10.0),
+    }
+    lower_bound, upper_bound = verdict_ranges.get(normalized_verdict, (0.0, 10.0))
+    bounded_score = min(max(clamped_score, lower_bound), upper_bound)
+    return round(bounded_score, 1)
 
 
 def extract_retry_after_seconds(error_message: str) -> float | None:
@@ -669,6 +696,10 @@ async def critique_generation_node(state: ScreeningState) -> dict[str, Any]:
         await state["emit_event"]("text.delta", {"delta": chunk})
 
     critique_payload["explanation"] = explanation_stream.strip()
+    critique_payload["score"] = normalize_critique_score(
+        critique_payload.get("score"),
+        critique_payload.get("verdict"),
+    )
     return {
         "critique_payload": critique_payload,
         "explanation_stream": explanation_stream.strip(),

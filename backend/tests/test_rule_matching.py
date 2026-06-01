@@ -5,6 +5,7 @@ from app.graph.workflow import (
     extract_retry_after_seconds,
     finalize_critique_node,
     contradiction_detection_node,
+    normalize_critique_score,
     rule_verification_node,
 )
 
@@ -89,6 +90,23 @@ def test_extract_retry_after_seconds_from_groq_message() -> None:
     assert retry_after == pytest.approx(0.34)
 
 
+@pytest.mark.parametrize(
+    ("score", "verdict", "expected"),
+    [
+        (1.2, "feasible", 1.2),
+        (4.2, "feasible", 3.0),
+        (2.4, "feasible_with_concerns", 3.0),
+        (4.6, "feasible_with_concerns", 4.6),
+        (6.3, "feasible_with_concerns", 5.0),
+        (5.5, "infeasible", 8.0),
+        (9.4, "infeasible", 9.4),
+        (12, "infeasible", 10.0),
+    ],
+)
+def test_normalize_critique_score_respects_verdict_ranges(score, verdict, expected) -> None:
+    assert normalize_critique_score(score, verdict) == expected
+
+
 @pytest.mark.anyio
 async def test_finalize_critique_does_not_backfill_baseline_rules() -> None:
     emitted_events: list[tuple[str, dict]] = []
@@ -131,6 +149,36 @@ async def test_finalize_critique_does_not_backfill_baseline_rules() -> None:
 
     assert result["critique_card"].trace.rules_matched == []
     assert result["critique_card"].trace.citations == []
+
+
+@pytest.mark.anyio
+async def test_finalize_critique_preserves_backend_score_payload() -> None:
+    emitted_events: list[tuple[str, dict]] = []
+
+    async def emit_event(event: str, data: dict) -> None:
+        emitted_events.append((event, data))
+
+    state = {
+        "run_id": "unit-test",
+        "material_formula": "LiCoO2",
+        "rules_loaded": [],
+        "matched_rules": [],
+        "violations": [],
+        "contradictions": [],
+        "critique_payload": {
+            "verdict": "feasible",
+            "score": 2.7,
+            "flags": [],
+            "suggestions": [],
+            "explanation": "Unit test explanation.",
+        },
+        "explanation_stream": "Unit test explanation.",
+        "emit_event": emit_event,
+    }
+
+    result = await finalize_critique_node(state)
+
+    assert result["critique_card"].score == 2.7
 
 
 @pytest.mark.anyio
