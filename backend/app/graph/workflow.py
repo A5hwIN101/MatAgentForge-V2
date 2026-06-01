@@ -1,8 +1,9 @@
 import asyncio
 import json
+import logging
 import os
 import re
-from itertools import combinations
+from itertools import count
 from pathlib import Path
 from typing import Any
 
@@ -21,12 +22,18 @@ RULES_PATH = Path(__file__).resolve().parents[2] / "rules" / "extracted_rules.js
 ENV_PATH = Path(__file__).resolve().parents[3] / ".env"
 RATE_LIMIT_BUFFER_SECONDS = 0.35
 SYSTEM_PROMPT_RULE = (
-    "You are a materials chemistry expert. Decide whether a screening rule is specifically applicable to the candidate material. "
-    "Return strict JSON with keys applicable (boolean), outcome ('concern', 'benefit', or 'not_applicable'), and reasoning (string). "
-    "Only mark applicable when you have material-specific justification. Do not assume thermal runaway or ionic conductivity rules apply by default."
+    "You are a materials chemistry expert. Review a candidate material against a batch of screening rules. "
+    "Return strict JSON with keys matched_rules, violations, confidence, and notes. "
+    "matched_rules must be a list of objects with keys rule_id, outcome ('concern' or 'benefit'), and reasoning. "
+    "violations must be a list of rule_id strings for concern-level matches only. "
+    "Only include rules when you have material-specific justification. "
+    "Do not invent rules, do not repeat the same rule twice, and do not include not_applicable rules."
 )
 SYSTEM_PROMPT_CONTRADICTION = (
-    "Do these two rules conflict? Answer YES or NO first, then give a concise explanation."
+    "You are a battery materials expert. Review the batch of concern-level rule matches and identify only real contradictions or tradeoff conflicts between them. "
+    "Return strict JSON with keys contradictions and notes. "
+    "contradictions must be a list of objects with keys rule_a, rule_b, type, resolution, and llm_reasoning. "
+    "If none exist, return an empty contradictions list."
 )
 SYSTEM_PROMPT_CRITIQUE = (
     "You are a battery materials expert. Given this candidate, rule set, violations, and contradictions, "
@@ -39,6 +46,8 @@ SYSTEM_PROMPT_EXPLANATION = (
     "You are a battery materials expert. Write a concise 2-3 sentence explanation for the critique. "
     "Focus on the most important benefits, violations, and contradictions."
 )
+logger = logging.getLogger(__name__)
+groq_call_counter = count(1)
 
 
 class InvalidMaterialFormulaError(ValueError):
@@ -99,6 +108,47 @@ def parse_json_block(text: str) -> dict[str, Any]:
     return json.loads(payload[start : end + 1])
 
 
+def estimate_token_count_from_text(text: str) -> int:
+    # Lightweight heuristic for diagnostics only; avoids changing request behavior.
+    normalized = text.strip()
+    if not normalized:
+        return 0
+    return max(1, round(len(normalized) / 4))
+
+
+def estimate_prompt_tokens(messages: list[dict[str, str]]) -> int:
+    total_chars = 0
+    for message in messages:
+        total_chars += len(message.get("role", ""))
+        total_chars += len(message.get("content", ""))
+    return max(1, round(total_chars / 4)) if total_chars else 0
+
+
+def log_groq_diagnostics(
+    *,
+    call_id: int,
+    stage: str,
+    run_id: str | None,
+    stream: bool,
+    attempt: int,
+    prompt_token_estimate: int,
+    response_token_estimate: int | None,
+    response_token_source: str,
+) -> None:
+    logger.info(
+        "GROQ_CALL id=%s stage=%s run_id=%s model=%s stream=%s attempt=%s prompt_tokens_est=%s response_tokens_est=%s response_token_source=%s",
+        call_id,
+        stage,
+        run_id or "unknown",
+        MODEL_NAME,
+        stream,
+        attempt,
+        prompt_token_estimate,
+        response_token_estimate if response_token_estimate is not None else "unknown",
+        response_token_source,
+    )
+
+
 def format_candidate_for_prompt(candidate: dict[str, Any]) -> str:
     return json.dumps(candidate, indent=2, default=str)
 
@@ -145,6 +195,106 @@ def compact_rule_summary(rule: dict[str, Any]) -> dict[str, Any]:
         "severity": rule.get("severity", "warning"),
         "reasoning": rule["reasoning"],
     }
+
+
+def compact_rule_prompt_entry(rule: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "rule_id": rule["id"],
+        "name": rule.get("name"),
+        "description": rule.get("description"),
+        "domain": rule.get("domain"),
+        "threshold_value": rule.get("threshold_value"),
+        "threshold_unit": rule.get("threshold_unit"),
+        "severity": rule.get("severity"),
+    }
+
+
+def normalize_rule_outcome(value: Any) -> str | None:
+    outcome = str(value or "").strip().lower()
+    if outcome in {"concern", "benefit"}:
+        return outcome
+    return None
+
+
+def parse_batched_rule_verification(
+    parsed: dict[str, Any],
+    *,
+    rule_lookup: dict[str, dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    matched_rules: list[dict[str, Any]] = []
+    violations: list[dict[str, Any]] = []
+    seen_rule_ids: set[str] = set()
+    violation_ids = {
+        str(rule_id).strip()
+        for rule_id in parsed.get("violations", [])
+        if str(rule_id).strip() in rule_lookup
+    }
+
+    for raw_match in parsed.get("matched_rules", []):
+        if not isinstance(raw_match, dict):
+            continue
+
+        rule_id = str(raw_match.get("rule_id", "")).strip()
+        if not rule_id or rule_id in seen_rule_ids or rule_id not in rule_lookup:
+            continue
+
+        outcome = normalize_rule_outcome(raw_match.get("outcome"))
+        if outcome is None and rule_id in violation_ids:
+            outcome = "concern"
+        if outcome is None:
+            continue
+
+        reasoning = str(raw_match.get("reasoning", "")).strip() or "Material-specific applicability identified."
+        matched_rule = build_matched_rule_entry(
+            rule_lookup[rule_id],
+            outcome=outcome,
+            reasoning=reasoning,
+        )
+        matched_rules.append(matched_rule)
+        seen_rule_ids.add(rule_id)
+        if outcome == "concern" or rule_id in violation_ids:
+            violations.append(matched_rule)
+
+    return matched_rules, violations
+
+
+def parse_batched_contradictions(
+    parsed: dict[str, Any],
+    *,
+    valid_rule_ids: set[str],
+) -> list[dict[str, Any]]:
+    contradictions: list[dict[str, Any]] = []
+    seen_pairs: set[tuple[str, str]] = set()
+
+    for raw_entry in parsed.get("contradictions", []):
+        if not isinstance(raw_entry, dict):
+            continue
+
+        rule_a = str(raw_entry.get("rule_a", "")).strip()
+        rule_b = str(raw_entry.get("rule_b", "")).strip()
+        if not rule_a or not rule_b or rule_a == rule_b:
+            continue
+        if rule_a not in valid_rule_ids or rule_b not in valid_rule_ids:
+            continue
+
+        pair = tuple(sorted((rule_a, rule_b)))
+        if pair in seen_pairs:
+            continue
+
+        contradictions.append(
+            {
+                "rule_a": rule_a,
+                "rule_b": rule_b,
+                "type": str(raw_entry.get("type", "potential_conflict")).strip() or "potential_conflict",
+                "resolution": str(raw_entry.get("resolution", "Review with expert judgement.")).strip()
+                or "Review with expert judgement.",
+                "llm_reasoning": str(raw_entry.get("llm_reasoning", "")).strip()
+                or "Potential tradeoff conflict identified by batched contradiction review.",
+            }
+        )
+        seen_pairs.add(pair)
+
+    return contradictions
 
 
 def extract_retry_after_seconds(error_message: str) -> float | None:
@@ -264,6 +414,9 @@ async def groq_call_with_retry(
     step_label: str | None = None,
 ) -> str | list[str]:
     last_error: Exception | None = None
+    call_id = next(groq_call_counter)
+    prompt_token_estimate = estimate_prompt_tokens(messages)
+    run_id = state.get("run_id") if state is not None else None
 
     for attempt in range(max_retries + 1):
         try:
@@ -271,8 +424,33 @@ async def groq_call_with_retry(
                 await emit_step_status(state, step, step_label)
 
             if stream:
-                return await asyncio.to_thread(_run_streaming_completion, messages)
-            return await asyncio.to_thread(_run_non_streaming_completion, messages)
+                result = await asyncio.to_thread(_run_streaming_completion, messages)
+                response_token_estimate = estimate_token_count_from_text("".join(result))
+                log_groq_diagnostics(
+                    call_id=call_id,
+                    stage=step or "unknown",
+                    run_id=run_id,
+                    stream=True,
+                    attempt=attempt,
+                    prompt_token_estimate=prompt_token_estimate,
+                    response_token_estimate=response_token_estimate,
+                    response_token_source="estimated_from_stream",
+                )
+                return result
+
+            result = await asyncio.to_thread(_run_non_streaming_completion, messages)
+            response_token_estimate = estimate_token_count_from_text(result)
+            log_groq_diagnostics(
+                call_id=call_id,
+                stage=step or "unknown",
+                run_id=run_id,
+                stream=False,
+                attempt=attempt,
+                prompt_token_estimate=prompt_token_estimate,
+                response_token_estimate=response_token_estimate,
+                response_token_source="estimated_from_text",
+            )
+            return result
         except (groq.APIError, groq.APITimeoutError, groq.APIConnectionError) as error:
             last_error = error
             if attempt >= max_retries:
@@ -339,6 +517,7 @@ async def rule_verification_node(state: ScreeningState) -> dict[str, Any]:
     candidate_text = format_candidate_for_prompt(candidate_summary)
     matched_rules: list[dict[str, Any]] = []
     violations: list[dict[str, Any]] = []
+    llm_rules: list[dict[str, Any]] = []
 
     for rule in state["rules_loaded"]:
         handled_locally, local_match = evaluate_special_case_rule(rule, state["candidate"])
@@ -349,57 +528,43 @@ async def rule_verification_node(state: ScreeningState) -> dict[str, Any]:
                     violations.append(local_match)
             continue
 
-        compact_rule = {
-            "id": rule["id"],
-            "name": rule.get("name"),
-            "description": rule.get("description"),
-            "domain": rule.get("domain"),
-            "threshold_value": rule.get("threshold_value"),
-            "threshold_unit": rule.get("threshold_unit"),
-            "severity": rule.get("severity"),
-        }
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT_RULE},
-            {
-                "role": "user",
-                "content": (
-                    f"Candidate:\n{candidate_text}\n\n"
-                    f"Rule:\n{json.dumps(compact_rule, indent=2)}\n\n"
-                    "Does the candidate violate the rule?"
-                ),
-            },
-        ]
+        llm_rules.append(rule)
 
-        try:
-            response_text = await groq_call_with_retry(
-                messages,
-                stream=False,
-                max_retries=3,
-                state=state,
-                step="rule_verification",
-                step_label="Verifying candidate against domain rules...",
-            )
-            parsed = parse_json_block(response_text)
-        except ModelRateLimitError:
-            raise
-        except Exception:
-            continue
+    if not llm_rules:
+        return {"matched_rules": matched_rules, "violations": violations}
 
-        if not parsed.get("applicable", False):
-            continue
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT_RULE},
+        {
+            "role": "user",
+            "content": (
+                f"Candidate:\n{candidate_text}\n\n"
+                f"Rules:\n{json.dumps([compact_rule_prompt_entry(rule) for rule in llm_rules], indent=2)}\n\n"
+                "Return strict JSON only."
+            ),
+        },
+    ]
 
-        outcome = str(parsed.get("outcome", "not_applicable")).strip().lower()
-        if outcome not in {"concern", "benefit"}:
-            continue
-
-        matched_rule = build_matched_rule_entry(
-            rule,
-            outcome=outcome,
-            reasoning=str(parsed.get("reasoning", "")).strip() or "Material-specific applicability identified.",
+    try:
+        response_text = await groq_call_with_retry(
+            messages,
+            stream=False,
+            max_retries=3,
+            state=state,
+            step="rule_verification",
+            step_label="Verifying candidate against domain rules...",
         )
-        matched_rules.append(matched_rule)
-        if outcome == "concern":
-            violations.append(matched_rule)
+        parsed = parse_json_block(response_text)
+        llm_matched_rules, llm_violations = parse_batched_rule_verification(
+            parsed,
+            rule_lookup={rule["id"]: rule for rule in llm_rules},
+        )
+        matched_rules.extend(llm_matched_rules)
+        violations.extend(llm_violations)
+    except ModelRateLimitError:
+        raise
+    except Exception:
+        logger.exception("Batched rule verification failed", extra={"run_id": state.get("run_id")})
 
     return {"matched_rules": matched_rules, "violations": violations}
 
@@ -407,21 +572,21 @@ async def rule_verification_node(state: ScreeningState) -> dict[str, Any]:
 async def contradiction_detection_node(state: ScreeningState) -> dict[str, Any]:
     await emit_step_event(state, "contradiction_detection", "Checking contradiction reasoning...")
 
-    contradictions: list[dict[str, Any]] = []
-    for violation_a, violation_b in combinations(state["violations"], 2):
-        violation_a_summary = compact_rule_summary(violation_a)
-        violation_b_summary = compact_rule_summary(violation_b)
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT_CONTRADICTION},
-            {
-                "role": "user",
-                "content": (
-                    f"Violation A:\n{json.dumps(violation_a_summary, indent=2)}\n\n"
-                    f"Violation B:\n{json.dumps(violation_b_summary, indent=2)}"
-                ),
-            },
-        ]
+    if len(state["violations"]) < 2:
+        return {"contradictions": []}
 
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT_CONTRADICTION},
+        {
+            "role": "user",
+            "content": (
+                f"Concern-level rule matches:\n{json.dumps([compact_rule_summary(violation) for violation in state['violations']], indent=2)}\n\n"
+                "Return strict JSON only."
+            ),
+        },
+    ]
+
+    try:
         response_text = await groq_call_with_retry(
             messages,
             stream=False,
@@ -430,19 +595,17 @@ async def contradiction_detection_node(state: ScreeningState) -> dict[str, Any]:
             step="contradiction_detection",
             step_label="Checking contradiction reasoning...",
         )
-        normalized = response_text.strip().upper()
-        if normalized.startswith("YES"):
-            contradictions.append(
-                {
-                    "rule_a": violation_a["rule_id"],
-                    "rule_b": violation_b["rule_id"],
-                    "type": "potential_conflict",
-                    "resolution": "Review with expert judgement.",
-                    "llm_reasoning": response_text.strip(),
-                }
-            )
-
-    return {"contradictions": contradictions}
+        parsed = parse_json_block(response_text)
+        contradictions = parse_batched_contradictions(
+            parsed,
+            valid_rule_ids={violation["rule_id"] for violation in state["violations"]},
+        )
+        return {"contradictions": contradictions}
+    except ModelRateLimitError:
+        raise
+    except Exception:
+        logger.exception("Batched contradiction detection failed", extra={"run_id": state.get("run_id")})
+        return {"contradictions": []}
 
 
 async def critique_generation_node(state: ScreeningState) -> dict[str, Any]:
