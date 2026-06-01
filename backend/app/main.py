@@ -11,10 +11,19 @@ from app.routes.feedback import router as feedback_router
 from app.routes.health import router as health_router
 from app.routes.screen import router as screen_router
 
+default_origins = {
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://mat-agent-forge-v2.vercel.app",
+}
+frontend_origin = os.getenv("FRONTEND_ORIGIN", "").strip()
+if frontend_origin:
+    default_origins.add(frontend_origin.rstrip("/"))
+
 app = FastAPI(title="MatAgent-Critique API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=sorted(default_origins),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
