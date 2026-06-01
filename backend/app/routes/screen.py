@@ -10,7 +10,12 @@ from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.db.models import Critique, Material
-from app.graph.workflow import InvalidMaterialFormulaError, run_screening_workflow
+from app.graph.workflow import (
+    InvalidMaterialFormulaError,
+    ModelRateLimitError,
+    RATE_LIMIT_BUFFER_SECONDS,
+    run_screening_workflow,
+)
 from app.services.chat_service import ChatService
 from app.streaming.sse import SSEEmitter
 
@@ -106,6 +111,20 @@ async def screen_material(
                     "screen.failed",
                     error_payload,
                 )
+            except ModelRateLimitError as error:
+                retry_hint = (
+                    f"Please retry in about {error.retry_after_seconds + RATE_LIMIT_BUFFER_SECONDS:.1f} seconds."
+                    if error.retry_after_seconds is not None
+                    else "Please retry shortly."
+                )
+                error_payload = {
+                    "code": "model_rate_limited",
+                    "title": "Model rate limit reached",
+                    "error": "The screening model is temporarily rate limited.",
+                    "hint": retry_hint,
+                }
+                service.append_item(chat_id, "error_card", error_payload)
+                await emit_event("screen.failed", error_payload)
             except (groq.APIError, groq.APITimeoutError, groq.APIConnectionError) as error:
                 error_payload = {"error": str(error)}
                 service.append_item(chat_id, "error_card", error_payload)

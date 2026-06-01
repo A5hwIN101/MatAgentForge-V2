@@ -5,7 +5,83 @@
 - **Purpose:** AI-powered battery materials screening agent with human-in-the-loop feedback
 - **Architecture:** Chat interface (React) + LangGraph pipeline (FastAPI) + Groq LLM + pre-trained rules engine
 - **Target:** Demo day June 4, 2026, 7pm ET
-- **Current Status:** arXiv scraper, rule extraction, citation integration, and live citation-backed critique payloads are COMPLETE. Current working state is ready for commit, multi-material verification, and deployment testing.
+- **Current Status:** arXiv scraper, rule extraction, citation integration, live citation-backed critique payloads, chat layout stabilization, and Groq rate-limit resilience are COMPLETE. Current focus is deployment readiness and production verification.
+
+---
+
+# CURRENT UI STATE (LATEST)
+
+## Current UI Direction
+
+* Terminal-style research workspace
+* Centered landing page
+* Single dominant scroll area
+* Compact navigation rail
+* Citation-backed critique workflow
+* Feedback actions preserved
+* Thinking process collapsible
+* Scientific typography throughout
+
+## Current Known UX Problems
+
+### P0 (First thing next session)
+
+1. Streaming still feels partially batched.
+2. Timeline steps feel too slow for a live demo.
+3. Some reasoning steps may display duplicated text lines during streaming.
+
+### P1
+
+1. Streaming step pacing still needs polish for live demo smoothness.
+2. Reasoning timeline can still be visually tightened for readability.
+
+### P2
+
+1. Continue streaming UX polish for clearer live progress perception.
+2. Keep reasoning timeline visually compact for demo readability.
+
+## UI Decisions Locked In
+
+* One scroll owner (MessageList)
+* No dashboard-style landing page
+* No duplicated material suggestion chips
+* Chat-first workflow
+* Result card visually resembles assistant output
+* Bottom composer remains part of the chat workspace
+* Thinking process collapsed by default
+* Thinking timeline uses:
+  1. Parse Material
+  2. Load Rules
+  3. Verify Rules
+  4. Final Assessment
+
+## Risk Score Rules
+
+IF verdict == infeasible:
+
+* Hide Risk Score completely.
+* Show:
+  Assessment: Not Viable
+
+IF verdict != infeasible:
+
+* Show Risk Score
+* Show helper text:
+  Lower is better
+
+Reason:
+Showing 0/10 risk for an infeasible material is misleading.
+
+## Immediate Next Session Tasks (Highest Priority)
+
+1. Commit and push current working state.
+2. Deploy backend to Railway.
+3. Deploy frontend to Vercel.
+4. Update frontend API URL.
+5. Verify SSE streaming on production.
+6. Verify Groq environment variables.
+7. Test LiCoO2, LiFePO4, and NMC on production.
+8. Verify feedback persistence on production.
 
 ---
 
@@ -70,6 +146,52 @@
 - **Frontend:** TraceDrawer now renders clickable arXiv links below matched domain rules
 - **Status:** Verified with live LiCoO2 payload containing citations
 
+### Chunk 3, Bucket 3.6.0h: Chat Layout Stabilization [COMPLETE]
+- **Completed:**
+  - Fixed duplicate-run rendering issue
+  - Fixed optimistic item vs persisted item duplication
+  - Fixed streamed result duplication path
+  - Added chat detail refresh reconciliation
+  - Added request lifecycle cleanup
+  - Added stale-run protection
+  - Added single active screening guard
+  - Added submit lock protection
+  - Reworked landing page into centered research workspace
+  - Simplified material suggestion UI
+  - Unified terminal/scientific typography
+  - Fixed scroll hierarchy
+  - Established single dominant scroll region
+  - Restored full result visibility
+  - Fixed thinking-process accessibility
+- **Files affected:**
+  - `useChat.ts`
+  - `useScreening.ts`
+  - `ChatLayout.tsx`
+  - `MessageList.tsx`
+  - `InputBox.tsx`
+  - `CritiqueCard.tsx`
+  - `TraceDrawer.tsx`
+  - `FeedbackActions.tsx`
+  - `globals.css`
+
+### Chunk 3, Bucket 3.6.0i: Groq Rate Limit Resilience [COMPLETE]
+- **Completed:**
+  - Added 429 detection
+  - Added retry delay parsing
+  - Added automatic retry with buffer
+  - Added user-facing retry status messages
+  - Added `ModelRateLimitError` path
+  - Added clean `screen.failed` handling
+  - Reduced downstream prompt size
+  - Added backend tests
+  - Prevented raw Groq exceptions from reaching users
+- **Files:**
+  - `backend/app/graph/workflow.py`
+  - `backend/app/routes/screen.py`
+  - `backend/tests/test_rule_matching.py`
+  - `backend/tests/test_chat_routes.py`
+- **Test result:** 20 backend tests passed
+
 ---
 
 ## CRITICAL FINDING: Rules Are Still Domain-Light [WARNING]
@@ -116,7 +238,7 @@ Tested with NaCl:
 ## TECHNOLOGY STACK (Confirmed Working)
 
 **Frontend:**
-- Next.js 16, React 18, TypeScript, Tailwind CSS
+- Next.js 16, React 19, TypeScript, Tailwind CSS
 - SSE streaming, real-time chat UI
 
 **Backend:**
@@ -134,8 +256,8 @@ Tested with NaCl:
 - 5 tables: chats, chat_items, materials, critiques, feedback
 
 **Deployment:**
-- Frontend: pending Vercel deploy
-- Backend: pending Railway deploy
+- Frontend: builds successfully locally, deployment pending on Vercel
+- Backend: tests passing locally, deployment pending on Railway
 
 ---
 
@@ -171,7 +293,17 @@ Tested with NaCl:
 - `backend/rule_extractor_simple.py`
 - `backend/rules/extracted_rules.json`
 - `backend/app/graph/workflow.py`
+- `backend/app/routes/screen.py`
 - `backend/app/schemas/critique.py`
+- `backend/tests/test_rule_matching.py`
+- `backend/tests/test_chat_routes.py`
+- `frontend/src/app/globals.css`
+- `frontend/src/features/chat/ChatLayout.tsx`
+- `frontend/src/features/chat/MessageList.tsx`
+- `frontend/src/features/chat/InputBox.tsx`
+- `frontend/src/hooks/useChat.ts`
+- `frontend/src/features/screening/useScreening.ts`
+- `frontend/src/components/CritiqueCard.tsx`
 - `frontend/src/types/critique.ts`
 - `frontend/src/components/TraceDrawer.tsx`
 
@@ -207,6 +339,9 @@ Tested with NaCl:
 - trace.citations count: [YES] 3
 - cited rules shown in rules_matched: [YES]
 - citations render in Trace drawer as clickable arXiv links: [YES]
+- backend tests: [YES] 20 passed
+- frontend lint: [YES] passes
+- frontend build: [YES] passes
 
 ---
 
@@ -219,21 +354,30 @@ Tested with NaCl:
 - Current: Streaming text is live, but step pacing can still feel compressed
 - Fix: Refine frontend event rendering for clearer progressive status display
 
-### Issue 2: Extracted Rule Quality
+### Issue 2: Duplicate Step Text Rendering
+- **Status:** Investigating
+- **Symptom:**
+  - Some reasoning steps may display duplicated text lines during streaming
+  - Does not affect critique correctness
+
+### Issue 3: Extracted Rule Quality
 - 12 extracted rules were successfully merged
 - Some of the extracted rules are generic rather than sharply electrochemistry-specific
 - This is acceptable for demo stability right now
 - No post-filtering pass is being added yet
 
-### Issue 3: Groq Model/Rate-Limit Constraints
+### Issue 4: Groq Model/Rate-Limit Constraints
 - `llama-3.2-90b-vision-preview` is decommissioned
 - Extractor falls back to a supported Groq model
 - Large rule payloads originally pushed screening into TPM limits
-- Verification prompts were trimmed to keep screening viable once citations were attached
+- Screening now detects 429 responses, parses retry delay, retries with a buffer, and avoids exposing raw Groq failures to users
 
-### Issue 4: Deployment Still Pending
-- Local frontend and backend work
-- Production deployment has not been completed yet
+### Issue 5: Deployment Still Pending
+- Frontend builds successfully
+- Frontend lint passes
+- Backend tests are passing
+- Local end-to-end workflow is operational
+- Production deployment has not been completed yet and is now the highest-priority task
 
 ---
 
@@ -254,6 +398,13 @@ Tested with NaCl:
 - [x] Feedback buttons render below critique
 - [x] Feedback storage (SQLite verified)
 - [x] Feedback success message ("Feedback saved")
+- [x] Duplicate-run rendering issue fixed
+- [x] Single dominant scroll region established
+- [x] Final critique/result visibility restored
+- [x] Thinking process reachable inside message flow
+- [x] Frontend lint passes
+- [x] Frontend build passes
+- [x] Backend tests passing (20)
 - [ ] Streaming UX polish
 - [ ] Multi-material live verification (LiCoO2, LiFePO4, NMC)
 - [ ] Deployment to Vercel + Railway
@@ -262,14 +413,14 @@ Tested with NaCl:
 
 ## NEXT IMMEDIATE STEPS
 
-1. **Commit and push the current working state**
-2. **Test 3 materials live**
-   - LiCoO2
-   - LiFePO4
-   - NMC
-3. **Record verdict + citation count for each**
-4. **Click feedback buttons for each**
-5. **Deploy frontend to Vercel and backend to Railway if tests pass**
+1. **Commit and push current working state**
+2. **Deploy backend to Railway**
+3. **Deploy frontend to Vercel**
+4. **Update frontend API URL**
+5. **Verify SSE streaming on production**
+6. **Verify Groq environment variables**
+7. **Test LiCoO2, LiFePO4, and NMC on production**
+8. **Verify feedback persistence on production**
 
 ---
 
@@ -307,6 +458,47 @@ Tested with NaCl:
 * Create a local checklist of demo materials with varied expected behavior [done]
 * Include manual fields for verdict, score, rules, citations, and notes [done]
 * Cover strong, mixed, weak, and negative-control examples [done]
+
+### Bucket 3.6.0f: Edison-Inspired Workstation UI
+* Replace the dominant history sidebar with a compact navigation rail and secondary history panel [done]
+* Add a centered empty-state research workspace with example materials [done]
+* Shift live analysis into a reasoning timeline instead of floating chat-status bubbles [done]
+* Separate critique output into Results, Reasoning, and Citations tabs [done]
+* Preserve SSE streaming, feedback actions, chat history, and citation links in the new shell [done]
+
+### Bucket 3.6.0g: Streaming UX Polish
+* Fix main workspace scrolling with sticky header and sticky material input [done]
+* Add a compact Braille loading indicator for active reasoning steps [done]
+* Improve live timeline progression using existing SSE step events [done]
+* Preserve progressive explanation typing with a subtle terminal-style cursor [done]
+
+### Bucket 3.6.0h: Chat Layout Stabilization
+* Fix duplicate-run rendering issue [done]
+* Fix optimistic item vs persisted item duplication [done]
+* Fix streamed result duplication path [done]
+* Add chat detail refresh reconciliation [done]
+* Add request lifecycle cleanup [done]
+* Add stale-run protection [done]
+* Add single active screening guard [done]
+* Add submit lock protection [done]
+* Rework landing page into centered research workspace [done]
+* Simplify material suggestion UI [done]
+* Unify terminal/scientific typography [done]
+* Fix scroll hierarchy [done]
+* Establish single dominant scroll region [done]
+* Restore full result visibility [done]
+* Fix thinking-process accessibility [done]
+
+### Bucket 3.6.0i: Groq Rate Limit Resilience
+* Add 429 detection [done]
+* Add retry delay parsing [done]
+* Add automatic retry with buffer [done]
+* Add user-facing retry status messages [done]
+* Add ModelRateLimitError path [done]
+* Add clean screen.failed handling [done]
+* Reduce downstream prompt size [done]
+* Add backend tests [done]
+* Prevent raw Groq exceptions from reaching users [done]
 
 ### Bucket 3.6.1: Error States
 * Implement error boundary in MessageList [to be done]
@@ -391,7 +583,7 @@ Tested with NaCl:
 * Test LiCoO2 verdict: feasible [done]
 * Test LiCoO2 rules_matched includes cited rules [done]
 * Test LiCoO2 citations_count: 3 [done]
-* Backend tests still pass (6 passed) [done]
+* Backend tests still pass (20 passed) [done]
 * Frontend lint passes [done]
 * Frontend build passes [done]
 
@@ -534,20 +726,36 @@ Tested with NaCl:
 
 ## Status Summary
 
+**Current focus**
+* Deployment readiness and production verification.
+
+**Not current focus**
+* More rules
+* More agents
+* More database integrations
+* Production hardening
+
+**Objective before demo day**
+* Deploy the working system and verify the live end-to-end demo path.
+
 **[done] Completed Foundations**
 * Full end-to-end system working [done]
 * 15 rules with citations [done]
 * Feedback loop closed [done]
-* Ready for demo-day validation [done]
+* Duplicate-run bug fixed [done]
+* Scroll hierarchy fixed [done]
+* Single dominant scroll area established [done]
+* Ready for deployment validation [done]
 
 **[in progress] Deployment**
-* Git push [to be done]
-* Vercel deployment [to be done]
+* Commit and push current state [to be done]
 * Railway deployment [to be done]
+* Vercel deployment [to be done]
+* Production SSE verification [to be done]
 
 **[to be done] Pre-Demo Validation**
-* Material testing [to be done]
-* Edge case testing [to be done]
+* Production material testing [to be done]
+* Feedback persistence verification [to be done]
 * Demo script [to be done]
 
 **[deferred] Post-Demo UX and Phase 2**
@@ -574,10 +782,14 @@ Tested with NaCl:
 
 ## LAST UPDATED
 
-**2026-05-31**
-- arXiv scraper created and fetched 30 papers
-- 12 new rules extracted and merged with the existing 3
-- Active rule count updated to 15
-- Citations linked to extracted rules and carried through critique.ready as `trace.citations`
-- TraceDrawer updated to render clickable arXiv links
-- LiCoO2 verified with verdict `feasible`, domain rules total `15`, and `trace.citations` count `3`
+**2026-06-01 (June 2026 Update)**
+- Duplicate-run bug fixed
+- Scroll hierarchy fixed
+- Single dominant scroll area established
+- Landing page simplified
+- Material suggestion UI simplified
+- Scientific typography unified
+- Groq 429 retry handling added
+- Prompt-size reduction implemented
+- Backend test suite passing
+- Deployment is now the primary focus

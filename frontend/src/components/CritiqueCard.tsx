@@ -1,108 +1,189 @@
 "use client";
 
-import { TraceDrawer } from "@/components/TraceDrawer";
+import { useState } from "react";
+
 import type { CritiqueCard as CritiqueCardType } from "@/types";
 
 type CritiqueCardProps = {
   critique: CritiqueCardType;
 };
 
+type WorkspaceTab = "results" | "citations";
+
+const TAB_OPTIONS: Array<{ id: WorkspaceTab; label: string }> = [
+  { id: "results", label: "Results" },
+  { id: "citations", label: "Citations" },
+];
+
+function toneForVerdict(verdict: string) {
+  const normalized = verdict.toLowerCase();
+  if (normalized.includes("infeasible")) {
+    return "border-rose-500/30 bg-rose-500/10 text-rose-100";
+  }
+  if (normalized.includes("concern")) {
+    return "border-amber-500/30 bg-amber-500/10 text-amber-100";
+  }
+  return "border-emerald-500/30 bg-emerald-500/10 text-emerald-100";
+}
+
 export function CritiqueCard({ critique }: CritiqueCardProps) {
-  const rulesLoaded = critique.domain_rules_total;
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>("results");
   const rulesMatched = critique.trace.rules_matched.length;
   const citationCount = critique.trace.citations.length;
+  const isInfeasible = critique.verdict.toLowerCase().includes("infeasible");
 
   return (
-    <article className="w-full max-w-3xl rounded-[2rem] border border-slate-800 bg-slate-900/85 p-6 shadow-2xl shadow-slate-950/40 backdrop-blur">
-      <header className="border-b border-slate-800 pb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">
-          Material
-        </p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-          {critique.material_formula}
-        </h2>
-      </header>
-
-      <section className="border-b border-slate-800 py-5">
-        <dl className="space-y-3 text-sm sm:text-base">
-          <div className="flex items-center justify-between gap-4">
-            <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
-              Rules Loaded
-            </dt>
-            <dd className="font-semibold text-slate-100">{rulesLoaded}</dd>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
-              Rules Matched
-            </dt>
-            <dd className="font-semibold text-emerald-300">{rulesMatched}</dd>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
-              Citations
-            </dt>
-            <dd className="font-semibold text-cyan-300">{citationCount}</dd>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
-              Risk Score
-            </dt>
-            <dd className="text-right">
-              <p className="font-semibold text-slate-100">{critique.score} / 10</p>
-              <p className="mt-1 text-xs text-slate-500">Lower is better</p>
-            </dd>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <dt className="font-medium uppercase tracking-[0.24em] text-slate-500">
-              Verdict
-            </dt>
-            <dd className="font-semibold text-amber-200">{critique.verdict}</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section className="border-b border-slate-800 py-5">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">
-          Critique Flags
-        </h3>
-        <ul className="mt-4 space-y-3">
-          {critique.flags.map((flag, index) => (
-            <li
-              key={`${flag.text}-${index}`}
-              className="flex items-start gap-3 rounded-2xl bg-slate-950/70 px-4 py-3 text-slate-200"
-            >
-              <span className="text-lg">{flag.icon}</span>
-              <span className="leading-6">{flag.text}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="border-b border-slate-800 py-5">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.34em] text-slate-500">
-          Suggestions
-        </h3>
-        <div className="mt-4 space-y-4">
-          {critique.suggestions.map((suggestion, index) => (
-            <article
-              key={`${suggestion.text}-${index}`}
-              className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-4"
-            >
-              <p className="text-base font-medium text-slate-100">-&gt; {suggestion.text}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
-                {suggestion.rationale}
-              </p>
-            </article>
-          ))}
+    <article className="w-full rounded-2xl border border-[#1c2420] bg-[#0b100d]/96 shadow-xl shadow-black/15">
+      <div className="flex items-start justify-between gap-4 border-b border-[#1c2420] px-5 py-4">
+        <div className="min-w-0">
+          <p className="font-mono text-[12px] text-[#8ca39a]">MatAgent Forge</p>
+          <h2 className="mt-2 font-mono text-xl font-semibold tracking-tight text-slate-50">
+            {critique.material_formula}
+          </h2>
         </div>
-      </section>
-
-      <section className="py-5">
-        <p className="text-sm leading-6 text-slate-400">{critique.explanation}</p>
-        <div className="mt-5">
-          <TraceDrawer trace={critique.trace} />
+        <div
+          className={`shrink-0 rounded-md border px-3 py-1.5 font-mono text-[12px] ${toneForVerdict(
+            critique.verdict,
+          )}`}
+        >
+          {critique.verdict}
         </div>
-      </section>
+      </div>
+
+      <div className="border-b border-[#1c2420] px-5 py-3">
+        <nav className="flex flex-wrap gap-2">
+          {TAB_OPTIONS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`rounded-md border px-3 py-1.5 font-mono text-[12px] transition ${
+                activeTab === tab.id
+                  ? "border-[#bc687c]/60 bg-[#bc687c]/10 text-[#f0cad1]"
+                  : "border-[#1c2420] bg-[#0d120f] text-[#7c8d86] hover:border-[#2b3530] hover:text-slate-200"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      <div className="px-5 py-5">
+        {activeTab === "results" ? (
+          <div className="space-y-5">
+            <div className="rounded-xl border border-[#1c2420] bg-[#101612] px-4 py-4 font-mono text-sm leading-7 text-slate-200">
+              {critique.explanation}
+            </div>
+
+            <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-lg border border-[#1c2420] bg-[#0f1512] px-4 py-3">
+                <p className="font-mono text-[11px] text-[#7f9088]">verdict</p>
+                <p className="mt-1 font-mono text-sm font-semibold text-slate-100">
+                  {critique.verdict}
+                </p>
+              </div>
+              <div className="rounded-lg border border-[#1c2420] bg-[#0f1512] px-4 py-3">
+                <p className="font-mono text-[11px] text-[#7f9088]">
+                  {isInfeasible ? "assessment" : "risk score"}
+                </p>
+                <p className="mt-1 font-mono text-sm font-semibold text-slate-100">
+                  {isInfeasible ? "Not viable" : `${critique.score} / 10`}
+                </p>
+                {!isInfeasible ? (
+                  <p className="mt-1 font-mono text-[11px] text-[#66736e]">Lower is better</p>
+                ) : null}
+              </div>
+              <div className="rounded-lg border border-[#1c2420] bg-[#0f1512] px-4 py-3">
+                <p className="font-mono text-[11px] text-[#7f9088]">rules matched</p>
+                <p className="mt-1 font-mono text-sm font-semibold text-slate-100">
+                  {rulesMatched}
+                </p>
+              </div>
+              <div className="rounded-lg border border-[#1c2420] bg-[#0f1512] px-4 py-3">
+                <p className="font-mono text-[11px] text-[#7f9088]">citations</p>
+                <p className="mt-1 font-mono text-sm font-semibold text-slate-100">
+                  {citationCount}
+                </p>
+              </div>
+            </section>
+
+            {critique.flags.length > 0 ? (
+              <section className="space-y-2">
+                <p className="font-mono text-[12px] text-[#84968d]">Flags</p>
+                <div className="space-y-2">
+                  {critique.flags.map((flag, index) => (
+                    <div
+                      key={`${flag.text}-${index}`}
+                      className="rounded-lg border border-[#1c2420] bg-[#0f1512] px-4 py-3 font-mono text-sm text-slate-200"
+                    >
+                      <span className="mr-2">{flag.icon}</span>
+                      {flag.text}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            {critique.suggestions.length > 0 ? (
+              <section className="space-y-2">
+                <p className="font-mono text-[12px] text-[#84968d]">Suggestions</p>
+                <div className="space-y-2">
+                  {critique.suggestions.map((suggestion, index) => (
+                    <article
+                      key={`${suggestion.text}-${index}`}
+                      className="rounded-lg border border-[#1c2420] bg-[#0f1512] px-4 py-3"
+                    >
+                      <p className="font-mono text-sm font-medium text-slate-100">
+                        {suggestion.text}
+                      </p>
+                      <p className="mt-2 font-mono text-sm leading-6 text-slate-400">
+                        {suggestion.rationale}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </div>
+        ) : null}
+
+        {activeTab === "citations" ? (
+          <section className="space-y-3">
+            {critique.trace.citations.length > 0 ? (
+              critique.trace.citations.map((citation) => (
+                <article
+                  key={`${citation.rule_id}-${citation.arxiv_id}-${citation.url}`}
+                  className="rounded-lg border border-[#1c2420] bg-[#101612] px-4 py-4"
+                >
+                  <p className="font-mono text-[12px] text-[#84968d]">{citation.rule_name}</p>
+                  <h4 className="mt-2 font-mono text-base text-slate-100">
+                    {citation.paper_title}
+                  </h4>
+                  <p className="mt-2 font-mono text-sm text-slate-400">
+                    {citation.authors} | {citation.year ?? "n/a"} | arXiv {citation.arxiv_id}
+                  </p>
+                  <a
+                    href={citation.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-block font-mono text-[12px] text-[#e0a9b5] underline decoration-[#bc687c]/60 underline-offset-2 transition hover:text-[#f0cad1]"
+                  >
+                    Open arXiv source
+                  </a>
+                  <p className="mt-3 font-mono text-sm leading-6 text-slate-300">
+                    {citation.evidence_from_paper ?? "No excerpt attached for this citation."}
+                  </p>
+                </article>
+              ))
+            ) : (
+              <div className="rounded-lg border border-dashed border-[#1c2420] bg-[#101612] px-4 py-5 text-sm text-[#74827d]">
+                No citations were attached to this critique.
+              </div>
+            )}
+          </section>
+        ) : null}
+      </div>
     </article>
   );
 }

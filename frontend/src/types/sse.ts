@@ -11,15 +11,24 @@ export type ScreenEventName =
   | "screen.failed";
 
 export type StreamStepName =
-  | "rule_loading"
+  | "load_domain_rules"
   | "candidate_analysis"
   | "rule_verification"
   | "contradiction_detection"
   | "critique_generation"
-  | "suggestion_engine"
   | "finalize_critique";
 
 export type StreamStatus = "pending" | "in_progress" | "completed" | "failed";
+
+export type WorkflowStep = {
+  id: StreamStepName;
+  number: string;
+  title: string;
+  label: string;
+  status: StreamStatus;
+  detail?: string;
+  terminalText?: string;
+};
 
 export type StepEventData = {
   step: StreamStepName;

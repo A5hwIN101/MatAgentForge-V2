@@ -17,9 +17,11 @@ type UseChatResult = {
   createChat: (title?: string) => Promise<Chat>;
   clearHistory: () => Promise<void>;
   refreshChats: () => Promise<void>;
+  refreshChatDetail: (chatId: string) => Promise<void>;
   appendLocalItem: (
     chatId: string,
     item: Omit<ChatItem, "id" | "chatId" | "sequenceNo" | "createdAt">,
+    fallbackChat?: Chat,
   ) => void;
 };
 
@@ -94,6 +96,58 @@ function mapChatItem(serverItem: ServerChatItem, index: number): ChatItem {
   };
 }
 
+function mapDetailChat(payload: ServerChatDetail, fallback: Chat | null): Chat | null {
+  if (payload.chat) {
+    return mapChat(payload.chat);
+  }
+
+  if (
+    payload.id &&
+    payload.title &&
+    payload.status &&
+    payload.created_at &&
+    payload.updated_at
+  ) {
+    return {
+      id: payload.id,
+      title: payload.title,
+      status: payload.status as Chat["status"],
+      createdAt: payload.created_at,
+      updatedAt: payload.updated_at,
+      lastMaterialFormula: fallback?.lastMaterialFormula,
+      lastVerdict: fallback?.lastVerdict,
+    };
+  }
+
+  return fallback;
+}
+
+function serializeItemContent(item: ChatItem): string {
+  if (item.contentText !== undefined) {
+    return item.contentText.trim();
+  }
+
+  if (item.contentJson !== undefined) {
+    return JSON.stringify(item.contentJson);
+  }
+
+  return "";
+}
+
+function itemsMatch(left: ChatItem, right: ChatItem): boolean {
+  return (
+    left.itemType === right.itemType &&
+    serializeItemContent(left) === serializeItemContent(right)
+  );
+}
+
+function resequenceItems(items: ChatItem[]): ChatItem[] {
+  return items.map((item, index) => ({
+    ...item,
+    sequenceNo: index + 1,
+  }));
+}
+
 export function useChat(apiBaseUrl = BACKEND_URL): UseChatResult {
   const [chats, setChats] = useState<Chat[]>([]);
   const [chatDetails, setChatDetails] = useState<Record<string, ChatDetail>>({});
@@ -132,15 +186,11 @@ export function useChat(apiBaseUrl = BACKEND_URL): UseChatResult {
     return () => window.clearTimeout(timeoutId);
   }, [refreshChats]);
 
-  useEffect(() => {
-    const loadDetail = async () => {
-      if (!activeChatId) {
-        return;
-      }
-
+  const refreshChatDetail = useCallback(
+    async (chatId: string) => {
       setIsLoadingDetail(true);
       try {
-        const response = await fetch(`${apiBaseUrl}/api/chats/${activeChatId}`, {
+        const response = await fetch(`${apiBaseUrl}/api/chats/${chatId}`, {
           cache: "no-store",
         });
         if (!response.ok) {
@@ -148,39 +198,55 @@ export function useChat(apiBaseUrl = BACKEND_URL): UseChatResult {
         }
 
         const payload = (await response.json()) as ServerChatDetail;
-        const baseChat =
-          payload.chat !== undefined
-            ? mapChat(payload.chat)
-            : chats.find((chat) => chat.id === activeChatId) ?? null;
+        const baseChat = mapDetailChat(payload, null);
 
         if (!baseChat) {
           throw new Error("Chat detail missing chat metadata");
         }
 
+        const persistedItems = (payload.items ?? []).map(mapChatItem);
+
         setChatDetails((current) => {
-          const existingDetail = current[activeChatId];
-          const persistedItems = (payload.items ?? []).map(mapChatItem);
-          const optimisticItems =
-            existingDetail?.items.filter((item) => item.id.startsWith("local-")) ?? [];
+          const existingDetail = current[chatId];
+          const pendingOptimisticItems =
+            existingDetail?.items.filter(
+              (item) =>
+                item.id.startsWith("local-") &&
+                !persistedItems.some((persistedItem) => itemsMatch(item, persistedItem)),
+            ) ?? [];
 
           return {
             ...current,
-            [activeChatId]: {
+            [chatId]: {
               chat: baseChat,
-              items: [...optimisticItems, ...persistedItems],
+              items: resequenceItems([...pendingOptimisticItems, ...persistedItems]),
             },
           };
         });
+        setChats((current) =>
+          current.map((chat) => (chat.id === chatId ? { ...chat, ...baseChat } : chat)),
+        );
         setError(null);
       } catch (detailError) {
         setError(detailError instanceof Error ? detailError.message : "Unable to load chat detail");
       } finally {
         setIsLoadingDetail(false);
       }
-    };
+    },
+    [apiBaseUrl],
+  );
 
-    void loadDetail();
-  }, [activeChatId, apiBaseUrl, chats]);
+  useEffect(() => {
+    if (!activeChatId) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      void refreshChatDetail(activeChatId);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [activeChatId, refreshChatDetail]);
 
   const createChat = useCallback(
     async (title = "New Chat") => {
@@ -228,17 +294,23 @@ export function useChat(apiBaseUrl = BACKEND_URL): UseChatResult {
   }, [apiBaseUrl]);
 
   const appendLocalItem = useCallback(
-    (chatId: string, item: Omit<ChatItem, "id" | "chatId" | "sequenceNo" | "createdAt">) => {
+    (
+      chatId: string,
+      item: Omit<ChatItem, "id" | "chatId" | "sequenceNo" | "createdAt">,
+      fallbackChat?: Chat,
+    ) => {
       const now = new Date().toISOString();
 
       setChatDetails((current) => {
-        const fallbackChat = chats.find((chat) => chat.id === chatId);
-        if (!fallbackChat && !current[chatId]) {
+        const resolvedChat =
+          current[chatId]?.chat ?? fallbackChat ?? chats.find((chat) => chat.id === chatId);
+
+        if (!resolvedChat) {
           return current;
         }
 
         const existingDetail = current[chatId] ?? {
-          chat: fallbackChat!,
+          chat: resolvedChat,
           items: [],
         };
 
@@ -297,6 +369,7 @@ export function useChat(apiBaseUrl = BACKEND_URL): UseChatResult {
     createChat,
     clearHistory,
     refreshChats,
+    refreshChatDetail,
     appendLocalItem,
   };
 }

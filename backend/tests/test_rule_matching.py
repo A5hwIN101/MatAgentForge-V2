@@ -1,6 +1,15 @@
 import pytest
 
-from app.graph.workflow import evaluate_special_case_rule, finalize_critique_node
+from app.graph.workflow import (
+    evaluate_special_case_rule,
+    extract_retry_after_seconds,
+    finalize_critique_node,
+)
+
+
+@pytest.fixture
+def anyio_backend() -> str:
+    return "asyncio"
 
 
 def test_cobalt_baseline_matches_cobalt_material() -> None:
@@ -64,6 +73,18 @@ def test_high_ionic_conductivity_matches_layered_oxide() -> None:
     assert handled is True
     assert matched is not None
     assert matched["outcome"] == "benefit"
+
+
+def test_extract_retry_after_seconds_from_groq_message() -> None:
+    message = (
+        "Error code: 429 - {'error': {'message': 'Rate limit reached for model "
+        "`llama-3.1-8b-instant`. Please try again in 340ms.', "
+        "'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+    )
+
+    retry_after = extract_retry_after_seconds(message)
+
+    assert retry_after == pytest.approx(0.34)
 
 
 @pytest.mark.anyio

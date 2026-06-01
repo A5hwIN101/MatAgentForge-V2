@@ -19,6 +19,7 @@ from app.schemas.critique import CritiqueCard
 MODEL_NAME = "llama-3.1-8b-instant"
 RULES_PATH = Path(__file__).resolve().parents[2] / "rules" / "extracted_rules.json"
 ENV_PATH = Path(__file__).resolve().parents[3] / ".env"
+RATE_LIMIT_BUFFER_SECONDS = 0.35
 SYSTEM_PROMPT_RULE = (
     "You are a materials chemistry expert. Decide whether a screening rule is specifically applicable to the candidate material. "
     "Return strict JSON with keys applicable (boolean), outcome ('concern', 'benefit', or 'not_applicable'), and reasoning (string). "
@@ -45,6 +46,12 @@ class InvalidMaterialFormulaError(ValueError):
         super().__init__(message)
 
 
+class ModelRateLimitError(RuntimeError):
+    def __init__(self, retry_after_seconds: float | None = None):
+        self.retry_after_seconds = retry_after_seconds
+        super().__init__("Model rate limit reached. Please retry shortly.")
+
+
 def get_groq_client() -> Groq:
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key and ENV_PATH.exists():
@@ -64,7 +71,11 @@ def get_groq_client() -> Groq:
 async def emit_step_event(state: ScreeningState, step: str, label: str) -> None:
     emit_event = state["emit_event"]
     await emit_event("step.started", {"step": step, "status": "started"})
-    await emit_event(
+    await emit_step_status(state, step, label)
+
+
+async def emit_step_status(state: ScreeningState, step: str, label: str) -> None:
+    await state["emit_event"](
         "step.updated",
         {
             "step": step,
@@ -92,6 +103,16 @@ def format_candidate_for_prompt(candidate: dict[str, Any]) -> str:
     return json.dumps(candidate, indent=2, default=str)
 
 
+def compact_candidate_summary(candidate: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "formula": candidate["formula"],
+        "normalized_formula": candidate.get("normalized_formula"),
+        "reduced_formula": candidate.get("reduced_formula"),
+        "elements": candidate.get("elements", []),
+        "oxidation_state_guesses": candidate.get("oxidation_state_guesses", [])[:2],
+    }
+
+
 def build_matched_rule_entry(
     rule: dict[str, Any],
     *,
@@ -114,6 +135,42 @@ def normalize_material_formula(formula: str) -> str:
     if grouped_elements_pattern.search(normalized):
         normalized = grouped_elements_pattern.sub(lambda match: match.group(1).replace(",", ""), normalized)
     return normalized
+
+
+def compact_rule_summary(rule: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "rule_id": rule["rule_id"],
+        "rule_name": rule["rule_name"],
+        "outcome": rule["outcome"],
+        "severity": rule.get("severity", "warning"),
+        "reasoning": rule["reasoning"],
+    }
+
+
+def extract_retry_after_seconds(error_message: str) -> float | None:
+    patterns = [
+        re.compile(r"try again in (?P<value>\d+(?:\.\d+)?)\s*(?P<unit>ms|milliseconds|s|sec|secs|seconds?)", re.IGNORECASE),
+        re.compile(r"retry after (?P<value>\d+(?:\.\d+)?)\s*(?P<unit>ms|milliseconds|s|sec|secs|seconds?)", re.IGNORECASE),
+    ]
+
+    for pattern in patterns:
+        match = pattern.search(error_message)
+        if not match:
+            continue
+
+        value = float(match.group("value"))
+        unit = match.group("unit").lower()
+        if unit.startswith("ms"):
+            return value / 1000
+        return value
+
+    return None
+
+
+def is_rate_limit_error(error: Exception) -> bool:
+    status_code = getattr(error, "status_code", None)
+    message = str(error).lower()
+    return status_code == 429 or "rate_limit_exceeded" in message or "rate limit reached" in message
 
 
 def validate_material_formula(formula: str) -> str:
@@ -201,19 +258,40 @@ async def groq_call_with_retry(
     messages: list[dict[str, str]],
     *,
     stream: bool = False,
-    max_retries: int = 1,
+    max_retries: int = 3,
+    state: ScreeningState | None = None,
+    step: str | None = None,
+    step_label: str | None = None,
 ) -> str | list[str]:
     last_error: Exception | None = None
 
     for attempt in range(max_retries + 1):
         try:
+            if attempt > 0 and state is not None and step and step_label:
+                await emit_step_status(state, step, step_label)
+
             if stream:
                 return await asyncio.to_thread(_run_streaming_completion, messages)
             return await asyncio.to_thread(_run_non_streaming_completion, messages)
         except (groq.APIError, groq.APITimeoutError, groq.APIConnectionError) as error:
             last_error = error
             if attempt >= max_retries:
+                if is_rate_limit_error(error):
+                    raise ModelRateLimitError(extract_retry_after_seconds(str(error))) from error
                 raise
+
+            if is_rate_limit_error(error):
+                retry_after = extract_retry_after_seconds(str(error)) or 1.0
+                wait_seconds = retry_after + RATE_LIMIT_BUFFER_SECONDS
+                if state is not None and step:
+                    await emit_step_status(
+                        state,
+                        step,
+                        f"Rate limit hit. Retrying in {wait_seconds:.1f}s...",
+                    )
+                await asyncio.sleep(wait_seconds)
+                continue
+
             await asyncio.sleep(1)
 
     if last_error is not None:
@@ -257,13 +335,7 @@ async def candidate_analysis_node(state: ScreeningState) -> dict[str, Any]:
 async def rule_verification_node(state: ScreeningState) -> dict[str, Any]:
     await emit_step_event(state, "rule_verification", "Verifying candidate against domain rules...")
 
-    candidate_summary = {
-        "formula": state["candidate"]["formula"],
-        "normalized_formula": state["candidate"].get("normalized_formula"),
-        "reduced_formula": state["candidate"]["reduced_formula"],
-        "elements": state["candidate"]["elements"],
-        "oxidation_state_guesses": state["candidate"]["oxidation_state_guesses"],
-    }
+    candidate_summary = compact_candidate_summary(state["candidate"])
     candidate_text = format_candidate_for_prompt(candidate_summary)
     matched_rules: list[dict[str, Any]] = []
     violations: list[dict[str, Any]] = []
@@ -299,8 +371,17 @@ async def rule_verification_node(state: ScreeningState) -> dict[str, Any]:
         ]
 
         try:
-            response_text = await groq_call_with_retry(messages, stream=False, max_retries=1)
+            response_text = await groq_call_with_retry(
+                messages,
+                stream=False,
+                max_retries=3,
+                state=state,
+                step="rule_verification",
+                step_label="Verifying candidate against domain rules...",
+            )
             parsed = parse_json_block(response_text)
+        except ModelRateLimitError:
+            raise
         except Exception:
             continue
 
@@ -328,18 +409,27 @@ async def contradiction_detection_node(state: ScreeningState) -> dict[str, Any]:
 
     contradictions: list[dict[str, Any]] = []
     for violation_a, violation_b in combinations(state["violations"], 2):
+        violation_a_summary = compact_rule_summary(violation_a)
+        violation_b_summary = compact_rule_summary(violation_b)
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT_CONTRADICTION},
             {
                 "role": "user",
                 "content": (
-                    f"Violation A:\n{json.dumps(violation_a, indent=2)}\n\n"
-                    f"Violation B:\n{json.dumps(violation_b, indent=2)}"
+                    f"Violation A:\n{json.dumps(violation_a_summary, indent=2)}\n\n"
+                    f"Violation B:\n{json.dumps(violation_b_summary, indent=2)}"
                 ),
             },
         ]
 
-        response_text = await groq_call_with_retry(messages, stream=False, max_retries=1)
+        response_text = await groq_call_with_retry(
+            messages,
+            stream=False,
+            max_retries=3,
+            state=state,
+            step="contradiction_detection",
+            step_label="Checking contradiction reasoning...",
+        )
         normalized = response_text.strip().upper()
         if normalized.startswith("YES"):
             contradictions.append(
@@ -358,8 +448,11 @@ async def contradiction_detection_node(state: ScreeningState) -> dict[str, Any]:
 async def critique_generation_node(state: ScreeningState) -> dict[str, Any]:
     await emit_step_event(state, "critique_generation", "Running critique...")
 
-    candidate_text = format_candidate_for_prompt(state["candidate"])
-    violation_text = json.dumps(state["violations"], indent=2)
+    candidate_text = format_candidate_for_prompt(compact_candidate_summary(state["candidate"]))
+    matched_rule_summaries = [compact_rule_summary(rule) for rule in state["matched_rules"]]
+    violation_summaries = [compact_rule_summary(rule) for rule in state["violations"]]
+    matched_rule_text = json.dumps(matched_rule_summaries, indent=2)
+    violation_text = json.dumps(violation_summaries, indent=2)
     contradiction_text = json.dumps(state["contradictions"], indent=2)
 
     critique_messages = [
@@ -368,13 +461,21 @@ async def critique_generation_node(state: ScreeningState) -> dict[str, Any]:
             "role": "user",
             "content": (
                 f"Candidate:\n{candidate_text}\n\n"
+                f"Matched relevant rules:\n{matched_rule_text}\n\n"
                 f"Violations:\n{violation_text}\n\n"
                 f"Contradictions:\n{contradiction_text}\n\n"
                 "Return strict JSON only."
             ),
         },
     ]
-    critique_text = await groq_call_with_retry(critique_messages, stream=False, max_retries=1)
+    critique_text = await groq_call_with_retry(
+        critique_messages,
+        stream=False,
+        max_retries=3,
+        state=state,
+        step="critique_generation",
+        step_label="Running critique...",
+    )
     critique_payload = parse_json_block(critique_text)
 
     explanation_messages = [
@@ -383,13 +484,21 @@ async def critique_generation_node(state: ScreeningState) -> dict[str, Any]:
             "role": "user",
             "content": (
                 f"Candidate:\n{candidate_text}\n\n"
+                f"Matched relevant rules:\n{matched_rule_text}\n\n"
                 f"Violations:\n{violation_text}\n\n"
                 f"Contradictions:\n{contradiction_text}\n\n"
                 f"Verdict summary:\n{json.dumps(critique_payload, indent=2)}"
             ),
         },
     ]
-    explanation_chunks = await groq_call_with_retry(explanation_messages, stream=True, max_retries=1)
+    explanation_chunks = await groq_call_with_retry(
+        explanation_messages,
+        stream=True,
+        max_retries=3,
+        state=state,
+        step="critique_generation",
+        step_label="Running critique...",
+    )
 
     explanation_stream = ""
     for chunk in explanation_chunks:
